@@ -1,0 +1,49 @@
+version: '2'
+services:
+  api:
+    build: ./golang
+    container_name: user-manager-api-server 
+    restart: always
+    working_dir: "/src"
+    ports:
+      - "8040:8040"
+    volumes:
+      - "./src:/src"
+    depends_on:
+      - ldap
+      - redis
+      - mysql
+  ldap:
+    image: osixia/openldap
+    container_name: user-manager-openldap
+    restart: always
+    environment:
+      LDAP_ORGANISATION: "Kindai-CSG"
+      LDAP_DOMAIN: "kindai.csg"
+      LDAP_ADMIN_PASSWORD: "admin"
+      LDAP_CONFIG_PASSWORD: "config"
+    ports:
+      - "389:389"
+    volumes:
+      - ./ldap:/var/lib/ldap
+      - ./slapd.d:/etc/ldap/slapd.d
+      - ./ldif:/ldif
+  redis:
+    image: redis:6.0-rc1-alpine3.11
+    container_name: user-manager-redis 
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./redis:/data"
+  mysql:
+    image: mysql:5.7
+    container_name: user-manager-mysql 
+    restart: always
+    volumes:
+        - "./mysql:/var/lib/mysql"
+    ports:
+        - "3306:3306"
+    environment:
+        - MYSQL_ROOT_PASSWORD=densan
+    
