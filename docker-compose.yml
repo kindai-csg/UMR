@@ -8,7 +8,7 @@ services:
     ports:
       - "8040:8040"
     volumes:
-      - "./src:/.go/src/github.com/kindaidensan/umr/"
+      - "./server:/.go/src/github.com/kindaidensan/umr/"
     depends_on:
       - ldap
       - redis
