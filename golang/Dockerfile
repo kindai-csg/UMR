@@ -1,8 +1,13 @@
 FROM golang:1.13.5-alpine3.10
 
-RUN apk add git && \
-    go get -v github.com/gin-gonic/gin
+ENV GOPATH /.go
 
+RUN apk add git
+
+RUN go get -v github.com/gin-gonic/gin
 RUN go get -v gopkg.in/ldap.v2
+RUN go get -v github.com/golang/mock/gomock
+RUN go get -v golang.org/x/tools/go/packages
+RUN go install github.com/golang/mock/mockgen
 
 CMD ["go", "run", "main.go"]
