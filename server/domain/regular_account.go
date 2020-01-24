@@ -1,6 +1,6 @@
 package domain
 
-type UserData struct {
+type RegularAccount struct {
 	ID string
 	UserType string
 	FirstName string
@@ -16,4 +16,4 @@ type UserData struct {
 	EmergencyPhoneNumber string
 }
 
-type UserDatas []UserData
+type RegularAccounts []RegularAccount

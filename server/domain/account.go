@@ -5,6 +5,7 @@ type Account struct {
 	Password string
 	Name string
 	EmailAddress string
+	AccountType string
 }
 
 type Accounts []Account
