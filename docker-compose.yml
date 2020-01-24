@@ -4,11 +4,11 @@ services:
     build: ./golang
     container_name: umr-api
     restart: always
-    working_dir: "/.go/src/github.com/kindaidensan/umr/"
+    working_dir: "/.go/src/github.com/kindaidensan/UMR/"
     ports:
       - "8040:8040"
     volumes:
-      - "./server:/.go/src/github.com/kindaidensan/umr/"
+      - "./server:/.go/src/github.com/kindaidensan/UMR/"
     depends_on:
       - ldap
       - redis
