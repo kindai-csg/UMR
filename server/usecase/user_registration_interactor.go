@@ -1,6 +1,10 @@
 package usecase
 
-import "github.com/kindaidensan/UMR/domain" 
+import (
+	"github.com/kindaidensan/UMR/domain"
+	"math/rand"
+	"time"
+)
 
 type UserRegistrationInteractor struct {
 	accountRepository AccountRepository
@@ -12,16 +16,17 @@ func NewUserRegistrationInteractor(accountRepository AccountRepository, regularA
 	return &userRegistrationInteractor
 }
 
-func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account domain.Account, regular domain.RegularAccount) error {
+func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account domain.Account, regular domain.RegularAccount) (int, error) {
 	err := interactor.accountRepository.TemporaryStore(account)
 	if err != nil {
-		return err
+		return -1, err
 	}
 	err = interactor.regularAccountRepository.TemporaryStore(regular)
 	if  err != nil {
-		return err
+		return -1, err
 	}
-	return nil
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(9000) + 1000, err
 }
 
 func (interactor *UserRegistrationInteractor ) Registration(id string)  error {

@@ -1,4 +1,4 @@
-package test_usecase
+package usecase_test
 
 import (
 	mock "github.com/kindaidensan/UMR/test/mock_usecase"
@@ -23,20 +23,27 @@ func TestRegistration(t *testing.T) {
 
 	aMock.EXPECT().TemporaryStore(account).Return(nil)
 	rMock.EXPECT().TemporaryStore(regular).Return(nil)
-	if (nil != userRegistrationInteractor.TemporaryRegistration(account, regular)) {
+	code, e := userRegistrationInteractor.TemporaryRegistration(account, regular) 
+	if (nil != e) {
 		t.Errorf("faild: TemporaryRegistration / Expectation: return nil")
 	}
+	if (code < 1000 || code > 9999) {
+		t.Errorf("faild: TemporaryRegistration / Expectation: return 1000 ~ 9999")
+	}
+
 
 	err := errors.New("error")
 
 	aMock.EXPECT().TemporaryStore(account).Return(err)
-	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(userRegistrationInteractor.TemporaryRegistration(account, regular))) {
+	code, e = userRegistrationInteractor.TemporaryRegistration(account, regular) 
+	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(e)) {
 		t.Errorf("faild: TemporaryRegistraton / Expectation: return type err")
 	}
 
 	aMock.EXPECT().TemporaryStore(account).Return(nil)
 	rMock.EXPECT().TemporaryStore(regular).Return(err)
-	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(userRegistrationInteractor.TemporaryRegistration(account, regular))) {
+	code, e = userRegistrationInteractor.TemporaryRegistration(account, regular) 
+	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(e)) {
 		t.Errorf("faild: TemporaryRegistration / Expectation: return type err")
 	}
 
