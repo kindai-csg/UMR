@@ -9,10 +9,15 @@ import (
 type UserRegistrationInteractor struct {
 	accountRepository AccountRepository
 	regularAccountRepository RegularAccountRepository
+	authenticationCodeRepository AuthenticationCodeRepository
 }
 
-func NewUserRegistrationInteractor(accountRepository AccountRepository, regularAccountRepository RegularAccountRepository) *UserRegistrationInteractor {
-	userRegistrationInteractor := UserRegistrationInteractor{accountRepository: accountRepository, regularAccountRepository: regularAccountRepository}
+func NewUserRegistrationInteractor(accountRepository AccountRepository, regularAccountRepository RegularAccountRepository, authenticationCodeRepository AuthenticationCodeRepository) *UserRegistrationInteractor {
+	userRegistrationInteractor := UserRegistrationInteractor {
+		accountRepository: accountRepository,
+		regularAccountRepository: regularAccountRepository,
+		authenticationCodeRepository: authenticationCodeRepository,
+	}
 	return &userRegistrationInteractor
 }
 
@@ -26,7 +31,16 @@ func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account dom
 		return -1, err
 	}
 	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(9000) + 1000, err
+	code := rand.Intn(9000) + 1000 
+	authentication := domain.AuthenticationCode {
+		ID: account.ID,
+		Code: code,
+	}
+	err = interactor.authenticationCodeRepository.Store(authentication)
+	if err != nil {
+		return -1, err
+	}
+	return code, err
 }
 
 func (interactor *UserRegistrationInteractor ) Registration(id string)  error {
