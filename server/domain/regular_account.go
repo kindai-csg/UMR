@@ -2,7 +2,6 @@ package domain
 
 type RegularAccount struct {
 	ID string
-	UserType string
 	FirstName string
 	LastName string
 	FirstNameKana string
