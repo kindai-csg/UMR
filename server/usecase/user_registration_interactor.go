@@ -8,26 +8,20 @@ import (
 
 type UserRegistrationInteractor struct {
 	accountRepository AccountRepository
-	regularAccountRepository RegularAccountRepository
 	authenticationCodeRepository AuthenticationCodeRepository
 }
 
-func NewUserRegistrationInteractor(accountRepository AccountRepository, regularAccountRepository RegularAccountRepository, authenticationCodeRepository AuthenticationCodeRepository) *UserRegistrationInteractor {
+func NewUserRegistrationInteractor(accountRepository AccountRepository, authenticationCodeRepository AuthenticationCodeRepository) *UserRegistrationInteractor {
 	userRegistrationInteractor := UserRegistrationInteractor {
 		accountRepository: accountRepository,
-		regularAccountRepository: regularAccountRepository,
 		authenticationCodeRepository: authenticationCodeRepository,
 	}
 	return &userRegistrationInteractor
 }
 
-func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account domain.Account, regular domain.RegularAccount) (int, error) {
+func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account domain.Account) (int, error) {
 	err := interactor.accountRepository.TemporaryStore(account)
 	if err != nil {
-		return -1, err
-	}
-	err = interactor.regularAccountRepository.TemporaryStore(regular)
-	if  err != nil {
 		return -1, err
 	}
 	rand.Seed(time.Now().UnixNano())
@@ -49,19 +43,10 @@ func (interactor *UserRegistrationInteractor ) Registration(id string)  error {
 		return err
 	} 
 
-	regular, err := interactor.regularAccountRepository.FindByIdFromTemporary(id)
-	if err != nil {
-		return err
-	}
-
 	err = interactor.accountRepository.Store(account)
 	if err != nil {
 		return err
 	}
 
-	err = interactor.regularAccountRepository.Store(regular)
-	if err != nil {
-		return err
-	}
 	return nil
 }

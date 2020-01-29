@@ -15,17 +15,14 @@ func TestRegistration(t *testing.T) {
 	defer ctrl.Finish()
 
 	aMock := mock.NewMockAccountRepository(ctrl)	
-	rMock := mock.NewMockRegularAccountRepository(ctrl) 
 	authMock := mock.NewMockAuthenticationCodeRepository(ctrl)
 
 	account := domain.Account{} 
-	regular := domain.RegularAccount{}
-	userRegistrationInteractor := usecase.NewUserRegistrationInteractor(aMock, rMock, authMock) 
+	userRegistrationInteractor := usecase.NewUserRegistrationInteractor(aMock, authMock) 
 
 	aMock.EXPECT().TemporaryStore(account).Return(nil)
-	rMock.EXPECT().TemporaryStore(regular).Return(nil)
 	authMock.EXPECT().Store(gomock.Any()).Return(nil)
-	code, e := userRegistrationInteractor.TemporaryRegistration(account, regular) 
+	code, e := userRegistrationInteractor.TemporaryRegistration(account) 
 	if (nil != e) {
 		t.Errorf("faild: TemporaryRegistration / Expectation: return nil")
 	}
@@ -36,30 +33,21 @@ func TestRegistration(t *testing.T) {
 	err := errors.New("error")
 
 	aMock.EXPECT().TemporaryStore(account).Return(nil)
-	rMock.EXPECT().TemporaryStore(regular).Return(nil)
 	authMock.EXPECT().Store(gomock.Any()).Return(err)
-	code, e = userRegistrationInteractor.TemporaryRegistration(account, regular) 
+	code, e = userRegistrationInteractor.TemporaryRegistration(account) 
 	if (nil == e) {
 		t.Errorf("faild: TemporaryRegistration / Expectation: return nil")
 	}
 
 	aMock.EXPECT().TemporaryStore(account).Return(err)
-	code, e = userRegistrationInteractor.TemporaryRegistration(account, regular) 
+	code, e = userRegistrationInteractor.TemporaryRegistration(account) 
 	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(e)) {
 		t.Errorf("faild: TemporaryRegistraton / Expectation: return type err")
 	}
 
-	aMock.EXPECT().TemporaryStore(account).Return(nil)
-	rMock.EXPECT().TemporaryStore(regular).Return(err)
-	code, e = userRegistrationInteractor.TemporaryRegistration(account, regular) 
-	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(e)) {
-		t.Errorf("faild: TemporaryRegistration / Expectation: return type err")
-	}
 
 	aMock.EXPECT().FindByIdFromTemporary("id").Return(account, nil)
-	rMock.EXPECT().FindByIdFromTemporary("id").Return(regular, nil)
 	aMock.EXPECT().Store(account).Return(nil)
-	rMock.EXPECT().Store(regular).Return(nil)
 	if (nil != userRegistrationInteractor.Registration("id")) {
 		t.Errorf("faild: Registration / Expectation: return nil")
 	}
@@ -70,22 +58,7 @@ func TestRegistration(t *testing.T) {
 	}
 
 	aMock.EXPECT().FindByIdFromTemporary("id").Return(account, nil)
-	rMock.EXPECT().FindByIdFromTemporary("id").Return(regular, err)
-	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(userRegistrationInteractor.Registration("id"))) {
-		t.Errorf("faild: TemporaryRegistration / Expectation: return type err")
-	}
-
-	aMock.EXPECT().FindByIdFromTemporary("id").Return(account, nil)
-	rMock.EXPECT().FindByIdFromTemporary("id").Return(regular, nil)
 	aMock.EXPECT().Store(account).Return(err)
-	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(userRegistrationInteractor.Registration("id"))) {
-		t.Errorf("faild: TemporaryRegistration / Expectation: return type err")
-	}
-
-	aMock.EXPECT().FindByIdFromTemporary("id").Return(account, nil)
-	rMock.EXPECT().FindByIdFromTemporary("id").Return(regular, nil)
-	aMock.EXPECT().Store(account).Return(nil)
-	rMock.EXPECT().Store(regular).Return(err)
 	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(userRegistrationInteractor.Registration("id"))) {
 		t.Errorf("faild: TemporaryRegistration / Expectation: return type err")
 	}
