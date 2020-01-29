@@ -22,25 +22,22 @@ func TestRegistration(t *testing.T) {
 
 	aMock.EXPECT().TemporaryStore(account).Return(nil)
 	authMock.EXPECT().Store(gomock.Any()).Return(nil)
-	code, e := userRegistrationInteractor.TemporaryRegistration(account) 
+	e := userRegistrationInteractor.TemporaryRegistration(account) 
 	if (nil != e) {
 		t.Errorf("faild: TemporaryRegistration / Expectation: return nil")
-	}
-	if (code < 1000 || code > 9999) {
-		t.Errorf("faild: TemporaryRegistration / Expectation: return 1000 ~ 9999")
 	}
 
 	err := errors.New("error")
 
 	aMock.EXPECT().TemporaryStore(account).Return(nil)
 	authMock.EXPECT().Store(gomock.Any()).Return(err)
-	code, e = userRegistrationInteractor.TemporaryRegistration(account) 
+	e = userRegistrationInteractor.TemporaryRegistration(account) 
 	if (nil == e) {
 		t.Errorf("faild: TemporaryRegistration / Expectation: return nil")
 	}
 
 	aMock.EXPECT().TemporaryStore(account).Return(err)
-	code, e = userRegistrationInteractor.TemporaryRegistration(account) 
+	e = userRegistrationInteractor.TemporaryRegistration(account) 
 	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(e)) {
 		t.Errorf("faild: TemporaryRegistraton / Expectation: return type err")
 	}

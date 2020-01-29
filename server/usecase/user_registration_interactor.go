@@ -19,10 +19,10 @@ func NewUserRegistrationInteractor(accountRepository AccountRepository, authenti
 	return &userRegistrationInteractor
 }
 
-func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account domain.Account) (int, error) {
+func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account domain.Account) error {
 	err := interactor.accountRepository.TemporaryStore(account)
 	if err != nil {
-		return -1, err
+		return err
 	}
 	rand.Seed(time.Now().UnixNano())
 	code := rand.Intn(9000) + 1000 
@@ -32,9 +32,9 @@ func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account dom
 	}
 	err = interactor.authenticationCodeRepository.Store(authentication)
 	if err != nil {
-		return -1, err
+		return err
 	}
-	return code, err
+	return err
 }
 
 func (interactor *UserRegistrationInteractor ) Registration(id string)  error {
