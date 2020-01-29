@@ -14,6 +14,7 @@ func TestAccountValidation(t *testing.T) {
 		Password: "12345678",
 		Name: "aiueo",
 		EmailAddress: "test@hogehoge.com",
+		StudentNumber: "1000000000",
 		AccountType: "Regular",
 	}
 
@@ -107,6 +108,13 @@ func TestAccountValidation(t *testing.T) {
 	// ---------------------------account type---------------------------
 	account.EmailAddress = "test@hogehoge.com"
 	account.AccountType = "re"
+	err = validate.Struct(account)
+	if err == nil {
+		t.Errorf("Faild validation")
+	}
+	// ---------------------------studnet number---------------------------
+	account.AccountType = "Regular"
+	account.StudentNumber = "100000000a"
 	err = validate.Struct(account)
 	if err == nil {
 		t.Errorf("Faild validation")
