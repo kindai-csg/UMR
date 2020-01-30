@@ -6,20 +6,20 @@ import (
 	"time"
 )
 
-type UserRegistrationInteractor struct {
+type UserInteractor struct {
 	accountRepository AccountRepository
 	authenticationCodeRepository AuthenticationCodeRepository
 }
 
-func NewUserRegistrationInteractor(accountRepository AccountRepository, authenticationCodeRepository AuthenticationCodeRepository) *UserRegistrationInteractor {
-	userRegistrationInteractor := UserRegistrationInteractor {
+func NewUserInteractor(accountRepository AccountRepository, authenticationCodeRepository AuthenticationCodeRepository) *UserInteractor {
+	userInteractor := UserInteractor {
 		accountRepository: accountRepository,
 		authenticationCodeRepository: authenticationCodeRepository,
 	}
-	return &userRegistrationInteractor
+	return &userInteractor
 }
 
-func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account domain.Account) error {
+func (interactor *UserInteractor ) TemporaryRegistration(account domain.Account) error {
 	err := interactor.accountRepository.TemporaryStore(account)
 	if err != nil {
 		return err
@@ -37,7 +37,7 @@ func (interactor *UserRegistrationInteractor ) TemporaryRegistration(account dom
 	return err
 }
 
-func (interactor *UserRegistrationInteractor ) Registration(id string)  error {
+func (interactor *UserInteractor ) Registration(id string)  error {
 	account, err := interactor.accountRepository.FindByIdFromTemporary(id)
 	if err != nil {
 		return err
