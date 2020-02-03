@@ -15,20 +15,15 @@ services:
       - mysql
     tty: true
   ldap:
-    image: osixia/openldap
+    build: ./openldap
     container_name: umr-openldap
     restart: always
-    environment:
-      LDAP_ORGANISATION: "Kindai-CSG"
-      LDAP_DOMAIN: "kindai.csg"
-      LDAP_ADMIN_PASSWORD: "admin"
-      LDAP_CONFIG_PASSWORD: "config"
+    # command: /usr/local/libexec/slapd -h "ldap:/// ldapi:///"
     ports:
       - "389:389"
     volumes:
-      - ./ldap:/var/lib/ldap
-      - ./slapd.d:/etc/ldap/slapd.d
-      - ./ldif:/ldif
+      - ./ldap:/usr/local/var/openldap-data
+    tty: true
   redis:
     image: redis:6.0-rc1-alpine3.11
     container_name: umr-redis 

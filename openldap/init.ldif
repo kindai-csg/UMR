@@ -1,0 +1,17 @@
+dn: dc=kindai-csg,dc=dev
+objectClass: organization
+objectClass: dcObject
+o: Kindai.Univ Computer Study Group
+dc: kindai-csg 
+
+dn: cn=Manager,dc=kindai-csg,dc=dev
+objectClass: organizationalRole
+cn: Manager
+
+dn: ou=account,dc=kindai-csg,dc=dev
+objectClass: organizationalUnit
+ou: account
+
+dn: ou=member,ou=account,dc=kindai-csg,dc=dev 
+objectClass: organizationalUnit
+ou: member
