@@ -18,7 +18,7 @@ services:
     build: ./openldap
     container_name: umr-openldap
     restart: always
-    # command: /usr/local/libexec/slapd -h "ldap:/// ldapi:///"
+    command: bash -c '/usr/local/libexec/slapd -h "ldap:/// ldapi:///" && bash'
     ports:
       - "389:389"
     volumes:

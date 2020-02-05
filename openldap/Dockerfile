@@ -21,5 +21,4 @@ WORKDIR /root
 
 RUN rm -rf ./openldap-2.4.49 ./openldap-2.4.49.tgz 
 
-# CMD ["bash"]
-# RUN /usr/local/libexec/slapd  -h "ldap:/// ldapi:///"
+CMD ["bash"]
