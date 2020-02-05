@@ -18,7 +18,7 @@ func TestRegistration(t *testing.T) {
 	authMock := mock.NewMockAuthenticationCodeRepository(ctrl)
 
 	account := domain.Account{} 
-	userInteractor  := usecase.NewUserInteractor(aMock, authMock) 
+	userInteractor  := usecase.NewAccountInteractor(aMock, authMock) 
 
 	aMock.EXPECT().TemporaryStore(account).Return(nil)
 	authMock.EXPECT().Store(gomock.Any()).Return(nil)
