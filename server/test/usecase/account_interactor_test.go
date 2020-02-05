@@ -42,21 +42,13 @@ func TestRegistration(t *testing.T) {
 		t.Errorf("faild: TemporaryRegistraton / Expectation: return type err")
 	}
 
-
-	aMock.EXPECT().FindByIdFromTemporary("id").Return(account, nil)
 	aMock.EXPECT().Store(account).Return(nil)
-	if (nil != userInteractor .Registration("id")) {
+	if (nil != userInteractor .Registration(account)) {
 		t.Errorf("faild: Registration / Expectation: return nil")
 	}
 
-	aMock.EXPECT().FindByIdFromTemporary("id").Return(account, err)
-	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(userInteractor .Registration("id"))) {
-		t.Errorf("faild: TemporaryRegistration / Expectation: return type err")
-	}
-
-	aMock.EXPECT().FindByIdFromTemporary("id").Return(account, nil)
 	aMock.EXPECT().Store(account).Return(err)
-	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(userInteractor .Registration("id"))) {
+	if (reflect.TypeOf(errors.New("")) != reflect.TypeOf(userInteractor .Registration(account))) {
 		t.Errorf("faild: TemporaryRegistration / Expectation: return type err")
 	}
 }

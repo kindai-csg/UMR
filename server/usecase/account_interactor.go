@@ -37,13 +37,8 @@ func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Accou
 	return err
 }
 
-func (interactor *AccountInteractor ) Registration(id string)  error {
-	account, err := interactor.accountRepository.FindByIdFromTemporary(id)
-	if err != nil {
-		return err
-	} 
-
-	err = interactor.accountRepository.Store(account)
+func (interactor *AccountInteractor ) Registration(account domain.Account)  error {
+	err := interactor.accountRepository.Store(account)
 	if err != nil {
 		return err
 	}
