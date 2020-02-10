@@ -1,4 +1,4 @@
-package usecase_test
+package database_test
 
 import (
 	mock "github.com/kindaidensan/UMR/test/mock_interfaces/mock_database"
