@@ -4,6 +4,7 @@ import (
 	"github.com/kindaidensan/UMR/domain"
 	"math/rand"
 	"time"
+	"strconv"
 )
 
 type AccountInteractor struct {
@@ -28,7 +29,7 @@ func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Accou
 	code := rand.Intn(9000) + 1000 
 	authentication := domain.AuthenticationCode {
 		ID: account.ID,
-		Code: code,
+		Code: strconv.Itoa(code),
 	}
 	err = interactor.authenticationCodeRepository.Store(authentication)
 	if err != nil {

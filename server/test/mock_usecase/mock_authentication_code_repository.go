@@ -47,17 +47,17 @@ func (mr *MockAuthenticationCodeRepositoryMockRecorder) Store(arg0 interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Store", reflect.TypeOf((*MockAuthenticationCodeRepository)(nil).Store), arg0)
 }
 
-// FindAll mocks base method
-func (m *MockAuthenticationCodeRepository) FindAll() (domain.AuthenticationCode, error) {
+// FindID mocks base method
+func (m *MockAuthenticationCodeRepository) FindID(arg0 string) (domain.AuthenticationCode, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAll")
+	ret := m.ctrl.Call(m, "FindID", arg0)
 	ret0, _ := ret[0].(domain.AuthenticationCode)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindAll indicates an expected call of FindAll
-func (mr *MockAuthenticationCodeRepositoryMockRecorder) FindAll() *gomock.Call {
+// FindID indicates an expected call of FindID
+func (mr *MockAuthenticationCodeRepositoryMockRecorder) FindID(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockAuthenticationCodeRepository)(nil).FindAll))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindID", reflect.TypeOf((*MockAuthenticationCodeRepository)(nil).FindID), arg0)
 }
