@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 	"strconv"
+	"errors"
 )
 
 type AccountInteractor struct {
@@ -36,6 +37,25 @@ func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Accou
 		return err
 	}
 	return err
+}
+
+func (interactor *AccountInteractor) FindTemporaryAccount(id string) (domain.Account, error) {
+	account, err := interactor.accountRepository.FindByIdFromTemporary(id)
+	if err != nil {
+		return domain.Account{}, err
+	}
+	return account, nil
+}
+
+func (interactor *AccountInteractor) AuthenticationTemporaryAccount(clientAuth domain.AuthenticationCode) error {
+	serverAuth, err := interactor.authenticationCodeRepository.FindID(clientAuth.ID)	
+	if err != nil {
+		return err
+	}
+	if serverAuth.Code != clientAuth.Code {
+		return errors.New("Faild: certification")
+	}
+	return nil
 }
 
 func (interactor *AccountInteractor ) Registration(account domain.Account)  error {
