@@ -2,7 +2,7 @@ package domain
 
 type AuthenticationCode struct {
 	ID string
-	Code int 
+	Code string 
 } 
 
 type AuthenticationCodes []AuthenticationCode

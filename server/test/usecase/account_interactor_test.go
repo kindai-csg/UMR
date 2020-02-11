@@ -52,3 +52,52 @@ func TestRegistration(t *testing.T) {
 		t.Errorf("faild: TemporaryRegistration / Expectation: return type err")
 	}
 }
+
+func TestFindTemporaryAccount(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	aMock := mock.NewMockAccountRepository(ctrl)	
+	authMock := mock.NewMockAuthenticationCodeRepository(ctrl)
+	userInteractor  := usecase.NewAccountInteractor(aMock, authMock) 
+
+	aMock.EXPECT().FindByIdFromTemporary(gomock.Any()).Return(domain.Account{}, nil)
+	_, err := userInteractor.FindTemporaryAccount("test")
+	if err != nil {
+		t.Errorf("faild: Expectation: return nil")	
+	}
+
+	aMock.EXPECT().FindByIdFromTemporary(gomock.Any()).Return(domain.Account{}, errors.New("error"))
+	_, err = userInteractor.FindTemporaryAccount("test")
+	if err == nil {
+		t.Errorf("faild: Expectation: return err")	
+	}
+}
+
+func TestAuthenticationTemporaryAccount(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	aMock := mock.NewMockAccountRepository(ctrl)	
+	authMock := mock.NewMockAuthenticationCodeRepository(ctrl)
+	userInteractor  := usecase.NewAccountInteractor(aMock, authMock) 	
+
+	client_auth := domain.AuthenticationCode {
+		ID: "test",
+		Code: "3340",
+	}
+	authMock.EXPECT().FindID("test").Return(client_auth, nil)
+	err := userInteractor.AuthenticationTemporaryAccount(client_auth)
+	if err != nil {
+		t.Errorf("faild: Expectation: return nil")	
+	}
+	authMock.EXPECT().FindID("test").Return(client_auth, errors.New("error"))
+	err = userInteractor.AuthenticationTemporaryAccount(client_auth)
+	if err == nil {
+		t.Errorf("faild: Expectation: return err")	
+	}
+	authMock.EXPECT().FindID("test").Return(domain.AuthenticationCode{ID: "test", Code: "0334"}, nil)
+	err = userInteractor.AuthenticationTemporaryAccount(client_auth)
+	if err == nil {
+		t.Errorf("faild: Expectation: return err")	
+	}
+
+}
