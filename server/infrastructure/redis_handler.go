@@ -30,14 +30,14 @@ func (handler *RedisHandler) Set(key string, value string) error {
 func (handler *RedisHandler) Get(key string) (string, error) {
 	value, err := redis.String(handler.connection.Do("GET", key))
 	if  err != nil {
-		return err
+		return value, err
 	}
-	return nil
+	return value, nil
 }
 
 func (handler *RedisHandler) RPush(key string, values []string) error {
 	for _, value := range values {
-		_. err := handler.connection.Do("RPUSH", key, value)
+		_, err := handler.connection.Do("RPUSH", key, value)
 		if err != nil {
 			return err
 		}
