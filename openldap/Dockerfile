@@ -16,6 +16,7 @@ RUN ./configure --with-tls -enable-crypt --with-cyrus-sasl -enable-rwm --enable-
 
 ADD ./slapd.conf /usr/local/etc/openldap/slapd.conf
 ADD ./rsyslog.conf /etc/rsyslog.conf
+ADD ./init.ldif /usr/local/etc/openldap/schema/init.ldif
 
 WORKDIR /root
 

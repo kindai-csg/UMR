@@ -6,6 +6,7 @@ RUN apk add git
 
 RUN go get -v github.com/gin-gonic/gin
 RUN go get -v gopkg.in/ldap.v2
+RUN go get -v github.com/garyburd/redigo/redis
 RUN go get -v github.com/golang/mock/gomock
 RUN go get -v golang.org/x/tools/go/packages
 RUN go install github.com/golang/mock/mockgen
