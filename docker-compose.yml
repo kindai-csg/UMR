@@ -1,5 +1,16 @@
 version: '2'
 services:
+  nginx:
+    image: nginx:1.17
+    container_name: umr-nginx
+    restart: always
+    ports:
+      - "3080:80"
+    volumes:
+      - "./nginx:/etc/nginx/conf.d/"
+    depends_on: 
+      - api
+      - client
   api:
     build: ./golang
     container_name: umr-api
@@ -13,6 +24,16 @@ services:
       - ldap
       - redis
       - mysql
+    tty: true
+  client:
+    build: ./nodejs
+    container_name: umr-client
+    restart: always
+    working_dir: "/src"
+    ports:
+      - "8050:3000"
+    volumes:
+      - "./client:/src"
     tty: true
   ldap:
     build: ./openldap

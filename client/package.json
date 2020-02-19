@@ -1,0 +1,30 @@
+{
+  "name": "umr",
+  "version": "1.0.0",
+  "description": "umr client",
+  "author": "kindai-csg",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt --hostname 0.0.0.0",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "test": "ava",
+    "test:unit": "cross-env TEST=unit ava ./test/specs/**/*",
+    "test:e2e": "cross-env TEST=e2e ava ./test/e2e/**/*"
+  },
+  "dependencies": {
+    "nuxt": "^2.0.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/vuetify": "^1.0.0",
+    "@vue/test-utils": "^1.0.0-beta.27",
+    "ava": "^3.0.0",
+    "@ava/babel": "^1.0.0",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "browser-env": "^3.2.5",
+    "require-extension-hooks": "^0.3.3",
+    "require-extension-hooks-babel": "^1.0.0",
+    "require-extension-hooks-vue": "^2.0.0"
+  }
+}
