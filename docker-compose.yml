@@ -1,5 +1,15 @@
 version: '2'
 services:
+  nginx:
+    image: nginx:1.17
+    container_name: umr-nginx
+    restart: always
+    ports:
+      - "3080:80"
+    volumes:
+      - "./nginx:/etc/nginx/conf.d/"
+    depends_on: 
+      - api
   api:
     build: ./golang
     container_name: umr-api
