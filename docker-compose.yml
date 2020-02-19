@@ -24,6 +24,16 @@ services:
       - redis
       - mysql
     tty: true
+  client:
+    build: ./nodejs
+    container_name: umr-client
+    restart: always
+    working_dir: "/src"
+    ports:
+      - "8050:3000"
+    volumes:
+      - "./client:/src"
+    tty: true
   ldap:
     build: ./openldap
     container_name: umr-openldap
