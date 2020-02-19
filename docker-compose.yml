@@ -10,6 +10,7 @@ services:
       - "./nginx:/etc/nginx/conf.d/"
     depends_on: 
       - api
+      - client
   api:
     build: ./golang
     container_name: umr-api
