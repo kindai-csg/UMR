@@ -9,20 +9,20 @@ import (
 )
 
 type AccountInteractor struct {
-	accountRepository AccountRepository
-	authenticationCodeRepository AuthenticationCodeRepository
+	AccountRepository AccountRepository
+	AuthenticationCodeRepository AuthenticationCodeRepository
 }
 
 func NewAccountInteractor(accountRepository AccountRepository, authenticationCodeRepository AuthenticationCodeRepository) *AccountInteractor {
 	accountInteractor :=AccountInteractor {
-		accountRepository: accountRepository,
-		authenticationCodeRepository: authenticationCodeRepository,
+		AccountRepository: accountRepository,
+		AuthenticationCodeRepository: authenticationCodeRepository,
 	}
 	return &accountInteractor
 }
 
 func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Account) error {
-	err := interactor.accountRepository.TemporaryStore(account)
+	err := interactor.AccountRepository.TemporaryStore(account)
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Accou
 		ID: account.ID,
 		Code: strconv.Itoa(code),
 	}
-	err = interactor.authenticationCodeRepository.Store(authentication)
+	err = interactor.AuthenticationCodeRepository.Store(authentication)
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Accou
 }
 
 func (interactor *AccountInteractor) FindTemporaryAccount(id string) (domain.Account, error) {
-	account, err := interactor.accountRepository.FindByIdFromTemporary(id)
+	account, err := interactor.AccountRepository.FindByIdFromTemporary(id)
 	if err != nil {
 		return domain.Account{}, err
 	}
@@ -48,7 +48,7 @@ func (interactor *AccountInteractor) FindTemporaryAccount(id string) (domain.Acc
 }
 
 func (interactor *AccountInteractor) AuthenticationTemporaryAccount(clientAuth domain.AuthenticationCode) error {
-	serverAuth, err := interactor.authenticationCodeRepository.FindID(clientAuth.ID)	
+	serverAuth, err := interactor.AuthenticationCodeRepository.FindID(clientAuth.ID)	
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (interactor *AccountInteractor) AuthenticationTemporaryAccount(clientAuth d
 }
 
 func (interactor *AccountInteractor ) Registration(account domain.Account)  error {
-	err := interactor.accountRepository.Store(account)
+	err := interactor.AccountRepository.Store(account)
 	if err != nil {
 		return err
 	}
