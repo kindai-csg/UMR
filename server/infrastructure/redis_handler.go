@@ -35,6 +35,22 @@ func (handler *RedisHandler) Get(key string) (string, error) {
 	return value, nil
 }
 
+func (handler *RedisHandler) ExpireSetKey(key string, second int) error {
+	_, err := handler.connection.Do("EXPIRE", key, second)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (handler *RedisHandler) GetTtl(key string) (int, error) {
+	ttl, err := redis.Int(handler.connection.Do("TTL", key))
+	if err != nil {
+		return -1, err
+	}
+	return ttl, nil
+}
+
 func (handler *RedisHandler) RPush(key string, values []string) error {
 	for _, value := range values {
 		_, err := handler.connection.Do("RPUSH", key, value)
