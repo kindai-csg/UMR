@@ -16,7 +16,7 @@ func TestSettingFormToken(t *testing.T) {
 	m := mock.NewMockRegisterFormRepository(ctrl)
 	interactor := usecase.NewSettingInteractor(m)
 
-	m.EXPECT().Set(gomock.Any()).Return(domain.RegisterForm{}, errors.New("error"))
+	m.EXPECT().Set(gomock.Any()).Return(errors.New("error"))
 	_, err := interactor.IssueFormToken(60)
 	if err == nil {
 		t.Errorf("faild: expectation error")

@@ -25,11 +25,11 @@ func (interactor *SettingInteractor) IssueFormToken(time int) (domain.RegisterFo
 		Token: uuid.String(),
 		Time: time,
 	}
-	form, err := interactor.RegisterFormRepository.Set(registerForm)
+	err = interactor.RegisterFormRepository.Set(registerForm)
 	if err != nil {
 		return registerForm, err
 	}
-	return form, nil
+	return registerForm, nil
 } 
 
 func (interactor *SettingInteractor) GetFormToken() (domain.RegisterForm, error) {

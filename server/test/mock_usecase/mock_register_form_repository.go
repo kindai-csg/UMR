@@ -34,12 +34,11 @@ func (m *MockRegisterFormRepository) EXPECT() *MockRegisterFormRepositoryMockRec
 }
 
 // Set mocks base method
-func (m *MockRegisterFormRepository) Set(arg0 domain.RegisterForm) (domain.RegisterForm, error) {
+func (m *MockRegisterFormRepository) Set(arg0 domain.RegisterForm) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Set", arg0)
-	ret0, _ := ret[0].(domain.RegisterForm)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Set indicates an expected call of Set
