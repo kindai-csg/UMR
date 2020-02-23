@@ -5,18 +5,18 @@ import (
 )
 
 type AuthenticationCodeRepository struct {
-	redisHandler RedisHandler
+	RedisHandler RedisHandler
 }
 
 func NewAuthenticationCodeRepository(redisHandler RedisHandler) *AuthenticationCodeRepository {
 	authenticationCodeRepository := AuthenticationCodeRepository {
-		redisHandler: redisHandler,
+		RedisHandler: redisHandler,
 	}
 	return &authenticationCodeRepository
 }
 
 func (repo *AuthenticationCodeRepository) Store(authenticationCode domain.AuthenticationCode) error {
-	err := repo.redisHandler.Set(authenticationCode.ID, authenticationCode.Code)
+	err := repo.RedisHandler.Set(authenticationCode.ID, authenticationCode.Code)
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func (repo *AuthenticationCodeRepository) Store(authenticationCode domain.Authen
 }
 
 func (repo *AuthenticationCodeRepository) FindID(id string) (domain.AuthenticationCode, error) {
-	code, err := repo.redisHandler.Get(id)
+	code, err := repo.RedisHandler.Get(id)
 	if err != nil {
 		return domain.AuthenticationCode{}, err
 	}

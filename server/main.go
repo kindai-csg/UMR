@@ -1,16 +1,9 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/kindaidensan/UMR/infrastructure"
 )
 
 func main() {
-	router := gin.Default()
-	
-	router.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"hello": "world",
-		})
-	})
-	router.Run(":8040")
+	infrastructure.Router.Run(":8040")
 }

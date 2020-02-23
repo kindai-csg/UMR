@@ -77,3 +77,33 @@ func TestRedisLPop(t *testing.T) {
 
 	} 
 }
+
+func TestRedisExpireSetKey(t *testing.T) {
+	redisHandler := inf.NewRedisHandler()
+	if redisHandler == nil {
+		t.Errorf("faild: cant create RedisHandler instance")
+	}
+	err := redisHandler.ExpireSetKey("test", "value", 20)
+	if err != nil {
+		t.Errorf("faild: expire set")
+		t.Errorf(err.Error())
+	}
+}
+
+func TestRedisGetTtl(t *testing.T) {
+	redisHandler := inf.NewRedisHandler()
+	if redisHandler == nil {
+		t.Errorf("faild: cant create RedisHandler instance")
+	}
+	err := redisHandler.ExpireSetKey("test", "value", 20)
+	if err != nil {
+		t.Errorf("faild: expire set")
+		t.Errorf(err.Error())
+	}
+	ttl, err := redisHandler.GetTtl("test")
+	if err != nil {
+		t.Errorf("faild: get ttl")
+		t.Errorf(err.Error())
+	}	
+	t.Log(ttl)
+}

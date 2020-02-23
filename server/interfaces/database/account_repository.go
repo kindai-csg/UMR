@@ -5,20 +5,20 @@ import (
 )
 
 type AccountRepository struct {
-	ldapHandler LdapHandler
-	redisHandler RedisHandler
+	LdapHandler LdapHandler
+	RedisHandler RedisHandler
 }
 
 func NewAccountRepository(ldapHandler LdapHandler, redisHandler RedisHandler) *AccountRepository {
 	accountRepository := AccountRepository {
-		ldapHandler: ldapHandler,
-		redisHandler: redisHandler,
+		LdapHandler: ldapHandler,
+		RedisHandler: redisHandler,
 	}
 	return &accountRepository
 }
 
 func (repo *AccountRepository) TemporaryStore(account domain.Account) error {
-	err := repo.redisHandler.RPush(account.ID, []string{account.Password, account.Name, account.EmailAddress, account.StudentNumber, account.AccountType})
+	err := repo.RedisHandler.RPush(account.ID, []string{account.Password, account.Name, account.EmailAddress, account.StudentNumber, account.AccountType})
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (repo *AccountRepository) TemporaryStore(account domain.Account) error {
 }
 
 func (repo *AccountRepository) FindByIdFromTemporary(id string) (domain.Account, error) {
-	account, err := repo.redisHandler.LPop(id, 5)
+	account, err := repo.RedisHandler.LPop(id, 5)
 	if err != nil {
 		return domain.Account{}, err
 	}
@@ -53,7 +53,7 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 		"displayName", account.Name,
 		"mail", account.EmailAddress,
 	}
-	err := repo.ldapHandler.AddRequest(request)
+	err := repo.LdapHandler.AddRequest(request)
 	if   err != nil {
 		return err
 	}

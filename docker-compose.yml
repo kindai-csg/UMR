@@ -16,6 +16,7 @@ services:
     container_name: umr-api
     restart: always
     working_dir: "/.go/src/github.com/kindaidensan/UMR/"
+    command: ash 
     ports:
       - "8040:8040"
     volumes:
