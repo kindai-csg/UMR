@@ -35,8 +35,20 @@ func (handler *RedisHandler) Get(key string) (string, error) {
 	return value, nil
 }
 
-func (handler *RedisHandler) ExpireSetKey(key string, second int) error {
-	_, err := handler.connection.Do("EXPIRE", key, second)
+func (handler *RedisHandler) ExpireSetKey(key string, value string, second int) error {
+	err := handler.connection.Send("MULTI")
+	if err != nil {
+		return err
+	}
+	err = handler.connection.Send("SET", key, value)
+	if err != nil {
+		return err
+	}
+	err = handler.connection.Send("EXPIRE", key, second)
+	if err != nil {
+		return err
+	}
+	_, err = handler.connection.Do("EXEC")
 	if err != nil {
 		return err
 	}

@@ -83,12 +83,7 @@ func TestRedisExpireSetKey(t *testing.T) {
 	if redisHandler == nil {
 		t.Errorf("faild: cant create RedisHandler instance")
 	}
-	err := redisHandler.Set("test", "test-value") 
-	if  err != nil {
-		t.Errorf("faild: set value")
-		t.Errorf(err.Error())
-	}
-	err = redisHandler.ExpireSetKey("test", 10)
+	err := redisHandler.ExpireSetKey("test", "value", 20)
 	if err != nil {
 		t.Errorf("faild: expire set")
 		t.Errorf(err.Error())
@@ -100,12 +95,7 @@ func TestRedisGetTtl(t *testing.T) {
 	if redisHandler == nil {
 		t.Errorf("faild: cant create RedisHandler instance")
 	}
-	err := redisHandler.Set("test", "test-value") 
-	if  err != nil {
-		t.Errorf("faild: set value")
-		t.Errorf(err.Error())
-	}
-	err = redisHandler.ExpireSetKey("test", 20)
+	err := redisHandler.ExpireSetKey("test", "value", 20)
 	if err != nil {
 		t.Errorf("faild: expire set")
 		t.Errorf(err.Error())
