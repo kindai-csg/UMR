@@ -7,6 +7,9 @@ type Account struct {
 	EmailAddress string `validate:"required,email"`
 	StudentNumber string `validate:"required,numeric"`
 	AccountType string `validate:"required,eq=Regular"`
+	UserIdNumber string
+	GroupIdNumber string
+	HomeDirectory  string
 }
 
 type Accounts []Account
