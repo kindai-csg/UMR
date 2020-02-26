@@ -84,3 +84,19 @@ func (handler *RedisHandler) LPop(key string, number int) ([]string, error) {
 	}
 	return result, nil
 }
+
+func (handler *RedisHandler) GetKeys(key string) ([]string, error) {
+	keys, err := redis.Values(handler.connection.Do("keys", key))
+	if err != nil {
+		return nil, err
+	}
+	result := []string{}
+	for _, key := range keys {
+		str := ""
+		for _, c := range key.([]uint8) {
+			str += string(c)
+		}
+		result = append(result, str)
+	}
+	return result, nil
+}

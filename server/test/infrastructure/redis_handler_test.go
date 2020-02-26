@@ -107,3 +107,16 @@ func TestRedisGetTtl(t *testing.T) {
 	}	
 	t.Log(ttl)
 }
+
+func TestGetKeys(t *testing.T) {
+	redisHandler := inf.NewRedisHandler()
+	if redisHandler == nil {
+		t.Errorf("faild: cant create RedisHandler instance")
+	}
+	keys, err := redisHandler.GetKeys("*")
+	if err != nil {
+		t.Errorf("faild: get keys")
+		t.Errorf(err.Error())
+	}
+	t.Log(keys)
+}
