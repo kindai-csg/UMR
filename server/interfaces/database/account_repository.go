@@ -18,7 +18,7 @@ func NewAccountRepository(ldapHandler LdapHandler, redisHandler RedisHandler) *A
 }
 
 func (repo *AccountRepository) TemporaryStore(account domain.Account) error {
-	err := repo.RedisHandler.RPush(account.ID, []string{account.Password, account.Name, account.EmailAddress, account.StudentNumber, account.AccountType})
+	err := repo.RedisHandler.RPush("tmp_"+account.ID, []string{account.Password, account.Name, account.EmailAddress, account.StudentNumber, account.AccountType})
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (repo *AccountRepository) TemporaryStore(account domain.Account) error {
 }
 
 func (repo *AccountRepository) FindByIdFromTemporary(id string) (domain.Account, error) {
-	account, err := repo.RedisHandler.LPop(id, 5)
+	account, err := repo.RedisHandler.LPop("tmp_"+id, 5)
 	if err != nil {
 		return domain.Account{}, err
 	}
@@ -46,9 +46,9 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 		"objectClass", "inetOrgPerson",
 		"cn", account.ID,
 		"uid", account.StudentNumber,
-		"uidNumber", account.StudentNumber[:2]+account.StudentNumber[7:],
-		"gidNumber", "1002",
-		"homeDirectory", "/home/"+account.ID,
+		"uidNumber", account.UserIdNumber,
+		"gidNumber", account.GroupIdNumber,
+		"homeDirectory", account.HomeDirectory,
 		"userPassword", account.Password,
 		"displayName", account.Name,
 		"mail", account.EmailAddress,
