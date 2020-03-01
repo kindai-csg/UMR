@@ -35,6 +35,32 @@ func (handler *RedisHandler) Get(key string) (string, error) {
 	return value, nil
 }
 
+func (handler *RedisHandler) Del(key string) error {
+	_, err := handler.connection.Do("DEL", key)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (handler *RedisHandler) MultiDel(keys []string) error {
+	err := handler.connection.Send("MULTI")
+	if err != nil {
+		return err
+	}
+	for _, key := range keys {
+		err = handler.connection.Send("DEL", key)
+		if err != nil {
+			return err
+		}
+	}
+	_, err = handler.connection.Do("EXEC")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (handler *RedisHandler) ExpireSetKey(key string, value string, second int) error {
 	err := handler.connection.Send("MULTI")
 	if err != nil {
@@ -99,4 +125,12 @@ func (handler *RedisHandler) GetKeys(key string) ([]string, error) {
 		result = append(result, str)
 	}
 	return result, nil
+}
+
+func (handler *RedisHandler) Incr(key string) (int, error) {
+	value, err := redis.Int(handler.connection.Do("INCR", key))
+	if err != nil {
+		return -1, err
+	}
+	return value, nil
 }
