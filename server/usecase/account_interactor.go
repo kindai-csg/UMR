@@ -52,10 +52,14 @@ func (interactor *AccountInteractor) AuthenticationTemporaryAccount(clientAuth d
 	if err != nil {
 		return err
 	}
-	if serverAuth.Code != clientAuth.Code {
-		return errors.New("Faild: certification")
+	if serverAuth.Code == clientAuth.Code {
+		return nil
 	}
-	return nil
+	err = interactor.AuthenticationCodeRepository.IncFailureCount(clientAuth.ID)
+	if err != nil {
+		return err
+	}
+	return errors.New("認証に失敗しました.")
 }
 
 func (interactor *AccountInteractor ) Registration(account domain.Account)  error {

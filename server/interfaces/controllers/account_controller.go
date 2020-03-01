@@ -4,7 +4,6 @@ import (
 	"github.com/kindaidensan/UMR/usecase"
 	"github.com/kindaidensan/UMR/domain"
 	"github.com/kindaidensan/UMR/interfaces/database"
-	"errors"
 )
 
 type AccountController struct {
@@ -48,18 +47,18 @@ func (controller *AccountController) AuthenticationCreate(c Context) {
 	c.Bind(&auth)
 	err := controller.interactor.AuthenticationTemporaryAccount(auth)
 	if err != nil {
-		c.JSON(500, errors.New("faild: certification"))
+		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
 	account, err := controller.interactor.FindTemporaryAccount(auth.ID)
 	if err != nil {
-		c.JSON(500, errors.New("faild: get account information"))
+		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
 	err = controller.interactor.Registration(account)
 	if err != nil {
-		c.JSON(500, errors.New("faild: create account"))
+		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
-	c.JSON(200, nil)
+	c.JSON(200, NewMsg("本登録が完了しました."))
 }

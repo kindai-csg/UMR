@@ -51,6 +51,7 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 		"gidNumber", account.GroupIdNumber,
 		"homeDirectory", account.HomeDirectory,
 		"userPassword", account.Password,
+		"sn", account.Name,
 		"displayName", account.Name,
 		"mail", account.EmailAddress,
 	}
@@ -58,6 +59,7 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 	if   err != nil {
 		return err
 	}
+	_ = repo.RedisHandler.MultiDel([]string { "auth_"+account.ID, "count_"+account.ID  })
 	return nil
 }
 

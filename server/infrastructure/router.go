@@ -27,8 +27,8 @@ func init() {
 		}
 		accountController.TemporaryCreate(c)
 	})
-	router.POST("/api/v1/registration/regist", func(c *gin.Context) {accountController.TemporaryCreate(c)})
-	router.POST("/api/v1/registration/authentication", func(c *gin.Context) {accountController.TemporaryCreate(c)})
+
+	router.POST("/authentication", func(c *gin.Context) {accountController.AuthenticationCreate(c)})
 
 	Router = router
 }
