@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/kindaidensan/UMR/domain" 
+	"strings"
 )
 
 type AccountRepository struct {
@@ -58,4 +59,19 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 		return err
 	}
 	return nil
+}
+
+func (repo *AccountRepository) GetAllUserID() ([]string, error) {
+	tmpIds, err := repo.RedisHandler.GetKeys("tmp_*")
+	if err != nil {
+		return nil, err
+	}
+	for i, _ := range tmpIds {
+		tmpIds[i] = strings.Replace(tmpIds[i], "tmp_", "", 1) 
+	}
+	ids, err := repo.LdapHandler.SearchRequest("*", []string { "cn" })
+	for _, cn := range ids {
+		tmpIds = append(tmpIds, cn[0])
+	}
+	return tmpIds, nil
 }

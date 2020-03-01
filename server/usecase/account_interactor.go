@@ -59,10 +59,26 @@ func (interactor *AccountInteractor) AuthenticationTemporaryAccount(clientAuth d
 }
 
 func (interactor *AccountInteractor ) Registration(account domain.Account)  error {
+	account.UserIdNumber = account.StudentNumber[7:]+account.StudentNumber[1:2]+account.StudentNumber[5:6]
+	account.GroupIdNumber = "1002"
+	account.HomeDirectory = "/home/"+account.ID
 	err := interactor.AccountRepository.Store(account)
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func (interactor *AccountInteractor) DuplicateCheck(id string) error {
+	ids, err := interactor.AccountRepository.GetAllUserID()
+	if err != nil {
+		return err
+	}
+	for _, alreay_id := range ids {
+		if id == alreay_id {
+			return errors.New("既にこのIDは使用されています.")
+		}
+	}
 	return nil
 }
