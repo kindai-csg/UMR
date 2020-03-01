@@ -2,7 +2,6 @@ package infrastructure
 
 import (
 	"gopkg.in/ldap.v2"
-	"fmt"
 )
 
 type LdapHandler struct {
@@ -62,7 +61,7 @@ func (handler *LdapHandler) DeleteRequest(id string) error {
 	return nil
 }
 
-func (handler *LdapHandler) SearchRequest(id string) error {
+func (handler *LdapHandler) SearchRequest(id string, attributes []string) ([][]string, error) {
 	searchRequest := ldap.NewSearchRequest(
 		"ou=account,dc=kindai-csg,dc=dev",
 		ldap.ScopeWholeSubtree,
@@ -71,17 +70,21 @@ func (handler *LdapHandler) SearchRequest(id string) error {
 		0,
 		false,
 		"(cn="+id+")",
-		[]string{"dn", "cn", "uid", "mail"},
+		attributes,
 		nil,
 	)
 	result, err := handler.connection.Search(searchRequest)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	for _, entry := range result.Entries {
-        fmt.Printf("%s: %v, %v\n", entry.DN, entry.GetAttributeValue("cn"), entry.GetAttributeValue("mail"))
-    }	
-	return nil
+	resultArray := [][]string{}
+	for i, entry := range result.Entries {
+		resultArray = append(resultArray, []string{})
+		for _, attr := range attributes {
+			resultArray[i] = append(resultArray[i], entry.GetAttributeValue(attr))	
+		}
+	}
+	return resultArray, nil
 }
 
 func (handler *LdapHandler) Close() {
