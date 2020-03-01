@@ -45,11 +45,12 @@ func TestLdapSearchRequest(t *testing.T) {
 		t.Errorf("faild: cant create LdapHandler instance")
 		return
 	}
-	err := ldapHandler.SearchRequest("test")
+	result, err := ldapHandler.SearchRequest("test", []string {"uid", "uidNumber", "gidNumber", "homeDirectory", "userPassword", "displayName", "mail"})
 	if err != nil {
 		t.Errorf("faild: err request")
 		t.Errorf(err.Error())
 	}
-	
-
+	for _, r := range result {
+		t.Log(r)
+	}
 }

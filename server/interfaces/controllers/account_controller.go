@@ -4,22 +4,21 @@ import (
 	"github.com/kindaidensan/UMR/usecase"
 	"github.com/kindaidensan/UMR/domain"
 	"github.com/kindaidensan/UMR/interfaces/database"
-	"errors"
 )
 
 type AccountController struct {
 	interactor usecase.AccountInteractor
 }
 
-func NewAccountController(ldapHandler database.LdapHandler, redisHandler RedisHandler) *AccountController {
+func NewAccountController(ldapHandler database.LdapHandler, redisHandler database.RedisHandler) *AccountController {
 	accountController := AccountController {
-		interactor: &usecase.AccountInteractor {
-			accountRepository: &database.AccountRepository {
-				ldapHandler: ldapHandler,
-				redisHandler: redisHandler,
+		interactor: usecase.AccountInteractor {
+			AccountRepository: &database.AccountRepository {
+				LdapHandler: ldapHandler,
+				RedisHandler: redisHandler,
 			},
-			authenticationCodeRepository: &database.AuthenticationCodeRepository {
-				redisHandler: redisHandler,
+			AuthenticationCodeRepository: &database.AuthenticationCodeRepository {
+				RedisHandler: redisHandler,
 			},
 		},
 	}
@@ -29,12 +28,17 @@ func NewAccountController(ldapHandler database.LdapHandler, redisHandler RedisHa
 func (controller *AccountController) TemporaryCreate(c Context) {
 	account := domain.Account{}
 	c.Bind(&account)
-	err := controller.interactor.TemporaryRegistration(account)
+	err := controller.interactor.DuplicateCheck(account.ID)
 	if err != nil {
-		c.JSON(500, errors.New("faild: create"))
+		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
-	c.JSON(200)
+	err = controller.interactor.TemporaryRegistration(account)
+	if err != nil {
+		c.JSON(500, NewMsg(err.Error())) 
+		return
+	}
+	c.JSON(200, NewMsg("仮登録が完了しました."))
 } 
 
 
@@ -43,18 +47,18 @@ func (controller *AccountController) AuthenticationCreate(c Context) {
 	c.Bind(&auth)
 	err := controller.interactor.AuthenticationTemporaryAccount(auth)
 	if err != nil {
-		c.JSON(500, errors.New("faild: certification"))
+		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
 	account, err := controller.interactor.FindTemporaryAccount(auth.ID)
 	if err != nil {
-		c.JSON(500, errors.New("faild: get account information"))
+		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
-	err := controller.interactor.Registration(account)
+	err = controller.interactor.Registration(account)
 	if err != nil {
-		c.JSON(500, errors.New("faild: create account"))
+		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
-	c.JSON(200)
+	c.JSON(200, NewMsg("本登録が完了しました."))
 }

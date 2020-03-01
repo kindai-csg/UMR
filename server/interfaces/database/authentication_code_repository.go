@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/kindaidensan/UMR/domain" 
+	"errors"
 )
 
 type AuthenticationCodeRepository struct {
@@ -16,7 +17,7 @@ func NewAuthenticationCodeRepository(redisHandler RedisHandler) *AuthenticationC
 }
 
 func (repo *AuthenticationCodeRepository) Store(authenticationCode domain.AuthenticationCode) error {
-	err := repo.RedisHandler.Set(authenticationCode.ID, authenticationCode.Code)
+	err := repo.RedisHandler.Set("auth_"+authenticationCode.ID, authenticationCode.Code)
 	if err != nil {
 		return err
 	}
@@ -24,9 +25,24 @@ func (repo *AuthenticationCodeRepository) Store(authenticationCode domain.Authen
 }
 
 func (repo *AuthenticationCodeRepository) FindID(id string) (domain.AuthenticationCode, error) {
-	code, err := repo.RedisHandler.Get(id)
+	code, err := repo.RedisHandler.Get("auth_"+id)
 	if err != nil {
 		return domain.AuthenticationCode{}, err
 	}
 	return domain.AuthenticationCode { ID: id, Code: code }, nil
+}
+
+func (repo *AuthenticationCodeRepository) IncFailureCount(id string) error {
+	count, err := repo.RedisHandler.Incr("count_"+id)
+	if err != nil {
+		return err
+	}
+	if count < 3 {
+		return nil
+	}
+	err = repo.RedisHandler.MultiDel([]string { "tmp_"+id, "auth_"+id, "count_"+id })
+	if err != nil {
+		return err
+	}
+	return errors.New("試行回数を超えました. もう一度登録からお願いします.")
 }
