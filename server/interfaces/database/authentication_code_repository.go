@@ -16,7 +16,7 @@ func NewAuthenticationCodeRepository(redisHandler RedisHandler) *AuthenticationC
 }
 
 func (repo *AuthenticationCodeRepository) Store(authenticationCode domain.AuthenticationCode) error {
-	err := repo.RedisHandler.Set(authenticationCode.ID, authenticationCode.Code)
+	err := repo.RedisHandler.Set("auth_"+authenticationCode.ID, authenticationCode.Code)
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func (repo *AuthenticationCodeRepository) Store(authenticationCode domain.Authen
 }
 
 func (repo *AuthenticationCodeRepository) FindID(id string) (domain.AuthenticationCode, error) {
-	code, err := repo.RedisHandler.Get(id)
+	code, err := repo.RedisHandler.Get("auth_"+id)
 	if err != nil {
 		return domain.AuthenticationCode{}, err
 	}
