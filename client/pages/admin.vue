@@ -25,7 +25,12 @@
     <v-expansion-panel>
       <v-expansion-panel-header>アカウント管理</v-expansion-panel-header>
       <v-expansion-panel-content>
-        アカウント一覧です.
+        <v-data-table
+          :headers="accounts_headers"
+          :items="accounts_desserts"
+          :items-per-page="5"
+          class="elevation-1"
+        />
       </v-expansion-panel-content>
     </v-expansion-panel>
     <v-expansion-panel>
@@ -46,7 +51,29 @@ export default {
       form_time: 0,
       form_error: "",
       required: value => !!value || "必須科目です",
-      number_check: value => !isNaN(value) || "半角英数字のみで入力してください"
+      number_check: value => !isNaN(value) || "半角英数字のみで入力してください",
+
+      accounts_headers: [
+        {
+          text: "ユーザーID",
+          align: "start",
+          sortable: false,
+          value: "ID",
+        },
+        {
+          text: "学籍番号",
+          value: "StudentNumber",
+        },
+        {
+          text: "名前",
+          value: "Name",
+        },
+        {
+          text: "メールアドレス",
+          value: "EmailAddress",
+        },
+      ],
+      accounts_desserts: [],
     }
   },
   created() {
@@ -55,11 +82,17 @@ export default {
         this.form_url = location.origin + "/register?token=" + result.Token
         this.form_time = result.Time
       })
-      setInterval(() => {
-        if (this.form_time > 0) {
-          this.form_time -= 1
-        }
-      }, 1000)
+    setInterval(() => {
+      if (this.form_time > 0) {
+        this.form_time -= 1
+      }
+    }, 1000)
+
+    this.$axios.$post('/api/admin/get_all_accounts')
+      .then((result) => {
+        console.log(result)
+        this.accounts_desserts = result
+      })
   },
   methods: {
     create_form() {
