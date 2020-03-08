@@ -77,3 +77,25 @@ func (repo *AccountRepository) GetAllUserID() ([]string, error) {
 	}
 	return tmpIds, nil
 }
+
+func (repo *AccountRepository) GetAllAccounts() ([]domain.Account, error) {
+	account_data, err := repo.LdapHandler.SearchRequest("*", []string { "cn", "userPassword", "displayName", "mail", "uid", "dn", "uidNumber", "gidNumber", "homeDirectory" })
+	if err != nil {
+		return nil, err
+	}
+	accounts := []domain.Account {}
+	for _, account := range account_data {
+		accounts = append(accounts, domain.Account {
+			ID: account[0],
+			Password: account[1],
+			Name: account[2],
+			EmailAddress: account[3],
+			StudentNumber: account[4],
+			AccountType: account[5],
+			UserIdNumber: account[6],
+			GroupIdNumber: account[7],
+			HomeDirectory: account[8], 
+		})
+	}
+	return accounts, nil
+}

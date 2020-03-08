@@ -86,3 +86,11 @@ func (interactor *AccountInteractor) DuplicateCheck(id string) error {
 	}
 	return nil
 }
+
+func (interactor *AccountInteractor) GetAllAccounts() ([]domain.Account, error) {
+	accounts, err := interactor.AccountRepository.GetAllAccounts()
+	if err != nil {
+		return []domain.Account {}, err
+	}
+	return accounts, nil
+}

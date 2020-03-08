@@ -19,6 +19,7 @@ func init() {
 
 	router.POST("/admin/create_register_form", func(c *gin.Context) {settingController.CreateRegisterForm(c)})
 	router.POST("/admin/get_register_form", func(c *gin.Context) {settingController.GetRegisterForm(c)})
+	router.POST("/admin/get_all_accounts", func(c *gin.Context) {accountController.GetAllAccounts(c)})
 
 	router.POST("/register", func(c *gin.Context) {
 		err := authenticationController.AuthenticationFormToken(c)

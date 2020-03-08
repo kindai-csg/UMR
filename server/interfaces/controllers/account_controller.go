@@ -62,3 +62,12 @@ func (controller *AccountController) AuthenticationCreate(c Context) {
 	}
 	c.JSON(200, NewMsg("本登録が完了しました."))
 }
+
+func (controller *AccountController) GetAllAccounts(c Context) {
+	accounts, err := controller.interactor.GetAllAccounts()
+	if err != nil {
+		c.JSON(500, NewMsg(err.Error()))
+		return
+	}
+	c.JSON(200, accounts)
+}

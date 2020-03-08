@@ -81,6 +81,10 @@ func (handler *LdapHandler) SearchRequest(id string, attributes []string) ([][]s
 	for i, entry := range result.Entries {
 		resultArray = append(resultArray, []string{})
 		for _, attr := range attributes {
+			if attr == "dn" {
+				resultArray[i] = append(resultArray[i], entry.DN)
+				continue
+			} 
 			resultArray[i] = append(resultArray[i], entry.GetAttributeValue(attr))	
 		}
 	}
