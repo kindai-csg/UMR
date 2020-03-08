@@ -79,7 +79,7 @@ func (repo *AccountRepository) GetAllUserID() ([]string, error) {
 }
 
 func (repo *AccountRepository) GetAllAccounts() ([]domain.Account, error) {
-	account_data, err := repo.LdapHandler.SearchRequest("*", []string { "cn", "userPassword", "displayName", "mail", "uid", "dn", "uidNumber", "gidNumber", "homeDirectory" })
+	account_data, err := repo.LdapHandler.SearchRequest("*", []string { "cn", "displayName", "mail", "uid", "dn" })
 	if err != nil {
 		return nil, err
 	}
@@ -87,14 +87,10 @@ func (repo *AccountRepository) GetAllAccounts() ([]domain.Account, error) {
 	for _, account := range account_data {
 		accounts = append(accounts, domain.Account {
 			ID: account[0],
-			Password: account[1],
-			Name: account[2],
-			EmailAddress: account[3],
-			StudentNumber: account[4],
-			AccountType: account[5],
-			UserIdNumber: account[6],
-			GroupIdNumber: account[7],
-			HomeDirectory: account[8], 
+			Name: account[1],
+			EmailAddress: account[2],
+			StudentNumber: account[3],
+			AccountType: account[4],
 		})
 	}
 	return accounts, nil
