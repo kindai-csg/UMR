@@ -54,14 +54,3 @@ services:
       - "6379:6379"
     volumes:
       - "./redis:/data"
-  mysql:
-    image: mysql:5.7
-    container_name: umr-mysql 
-    restart: always
-    volumes:
-        - "./mysql:/var/lib/mysql"
-    ports:
-        - "3306:3306"
-    environment:
-        - MYSQL_ROOT_PASSWORD=densan
-    
