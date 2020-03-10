@@ -24,7 +24,7 @@ services:
     depends_on:
       - ldap
       - redis
-      - mysql
+      - smtp
     tty: true
   client:
     build: ./nodejs
@@ -54,3 +54,7 @@ services:
       - "6379:6379"
     volumes:
       - "./redis:/data"
+  smtp:
+    image: schickling/mailcatcher
+    container_name: umr-smtp
+    restart: always
