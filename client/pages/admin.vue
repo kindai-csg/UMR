@@ -41,7 +41,17 @@
           :items="activate_desserts"
           :items-per-page="5"
           class="elevation-1"
-        />
+        >
+          <template v-slot:item.actions="{ item }">
+            <v-icon
+              small
+              class="mr-2"
+              @click="activate_item(item)"
+            >
+              mdi-account-check
+            </v-icon>
+          </template>
+        </v-data-table>
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
@@ -83,9 +93,14 @@ export default {
           text: "ユーザーID",
           align: "start",
           value: "ID",
+        },
+        {
+          text: "アクション",
+          value: 'actions',
+          sortable: false,
         }
       ],
-      accounts_desserts: [],
+      activate_desserts: [],
     }
   },
   created() {
@@ -105,11 +120,17 @@ export default {
         console.log(result)
         this.accounts_desserts = result
       })
+      .catch((error) => {
+        console.log(error)
+      })
 
     this.$axios.$post('/api/admin/get_all_non_active_account_id')
       .then((result) => {
         console.log(result)
         this.activate_desserts = result
+      })
+      .catch((error) => {
+        console.log(error)
       })
   },
   methods: {
@@ -130,6 +151,19 @@ export default {
             }
           })
       }
+    },
+    activate_item(item) {
+      const params = new URLSearchParams()
+      params.append('ID', item.ID)
+      this.$axios.$post('/api/admin/activation', params)
+        .then(() => {
+          console.log("success")
+          const index = this.activate_desserts.indexOf(item)
+          this.activate_desserts.splice(index, 1)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   }
 }
