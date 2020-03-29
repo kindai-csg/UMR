@@ -95,3 +95,29 @@ func (repo *AccountRepository) GetAllAccounts() ([]domain.Account, error) {
 	}
 	return accounts, nil
 }
+
+func (repo *AccountRepository) GetAllNonActiveAccountID() ([]string, error) {
+	tmps, err := repo.RedisHandler.GetKeys("tmp_*")
+	if err != nil {
+		return nil, err
+	}
+	auths, err := repo.RedisHandler.GetKeys("auth_*")
+	if err != nil {
+		return nil, err
+	}
+	accounts := []string {}
+	for _, tmp := range tmps {
+		id := strings.Replace(tmp, "tmp_", "", 1)
+		isAuth := false
+		for _, auth := range auths {
+			if id == strings.Replace(auth, "auth_", "", 1) {
+				isAuth = true
+				break
+			} 
+		}
+		if !isAuth {
+			accounts = append(accounts, id)
+		}
+	}
+	return accounts, nil
+} 

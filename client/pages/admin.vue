@@ -34,9 +34,14 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
     <v-expansion-panel>
-      <v-expansion-panel-header>アカウントアクティベイト</v-expansion-panel-header>
+      <v-expansion-panel-header>アカウントアクティベート</v-expansion-panel-header>
       <v-expansion-panel-content>
-        アカウントを有効にします.
+        <v-data-table
+          :headers="activate_headers"
+          :items="activate_desserts"
+          :items-per-page="5"
+          class="elevation-1"
+        />
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
@@ -57,7 +62,6 @@ export default {
         {
           text: "ユーザーID",
           align: "start",
-          sortable: false,
           value: "ID",
         },
         {
@@ -72,6 +76,14 @@ export default {
           text: "メールアドレス",
           value: "EmailAddress",
         },
+      ],
+      accounts_desserts: [],
+      activate_headers: [
+        {
+          text: "ユーザーID",
+          align: "start",
+          value: "ID",
+        }
       ],
       accounts_desserts: [],
     }
@@ -92,6 +104,12 @@ export default {
       .then((result) => {
         console.log(result)
         this.accounts_desserts = result
+      })
+
+    this.$axios.$post('/api/admin/get_all_non_active_account_id')
+      .then((result) => {
+        console.log(result)
+        this.activate_desserts = result
       })
   },
   methods: {

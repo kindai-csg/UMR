@@ -56,7 +56,28 @@ func (controller *AccountController) AuthenticationCreate(c Context) {
 		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
-	account, err := controller.interactor.FindTemporaryAccount(auth.ID)
+	// account, err := controller.interactor.FindTemporaryAccount(auth.ID)
+	// if err != nil {
+	// 	c.JSON(500, NewMsg(err.Error()))
+	// 	return
+	// }
+	// err = controller.interactor.Registration(account)
+	// if err != nil {
+	// 	c.JSON(500, NewMsg(err.Error()))
+	// 	return
+	// }
+	// c.JSON(200, NewMsg("本登録が完了しました."))
+	c.JSON(200, NewMsg("認証が完了しました."))
+}
+
+func (controller *AccountController) Activation(c Context) {
+	id := c.PostForm("ID")
+	err := controller.interactor.AuthenticationCheck(id)
+	if err != nil {
+		c.JSON(500, NewMsg(err.Error()))
+		return
+	}
+	account, err := controller.interactor.FindTemporaryAccount(id)
 	if err != nil {
 		c.JSON(500, NewMsg(err.Error()))
 		return
@@ -66,11 +87,20 @@ func (controller *AccountController) AuthenticationCreate(c Context) {
 		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
-	c.JSON(200, NewMsg("本登録が完了しました."))
+	c.JSON(200, NewMsg("本登録が完了しました."))	
 }
 
 func (controller *AccountController) GetAllAccounts(c Context) {
 	accounts, err := controller.interactor.GetAllAccounts()
+	if err != nil {
+		c.JSON(500, NewMsg(err.Error()))
+		return
+	}
+	c.JSON(200, accounts)
+}
+
+func (controller *AccountController) GetAllNonActiveAccountID(c Context) {
+	accounts, err := controller.interactor.GetAllNonActiveAccountID()	
 	if err != nil {
 		c.JSON(500, NewMsg(err.Error()))
 		return

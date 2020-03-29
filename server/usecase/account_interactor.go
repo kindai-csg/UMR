@@ -94,3 +94,28 @@ func (interactor *AccountInteractor) GetAllAccounts() ([]domain.Account, error) 
 	}
 	return accounts, nil
 }
+
+func (interactor *AccountInteractor) GetAllNonActiveAccountID() ([]domain.Account, error) {
+	ids, err := interactor.AccountRepository.GetAllNonActiveAccountID()
+	if err != nil {
+		return nil, err
+	}
+	accounts := []domain.Account {}
+	for _, id := range ids {
+		accounts = append(accounts, domain.Account { ID: id })
+	}
+	return accounts, nil
+}
+
+func (interactor *AccountInteractor) AuthenticationCheck(id string) (error) {
+	ids, err := interactor.AccountRepository.GetAllNonActiveAccountID()
+	if err != nil {
+		return err
+	}
+	for _, _id := range ids {
+		if id == _id {
+			return nil
+		} 
+	}
+	return errors.New("認証が完了していないアカウントです")
+}
