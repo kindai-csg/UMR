@@ -58,3 +58,6 @@ services:
     image: schickling/mailcatcher
     container_name: umr-smtp
     restart: always
+    ports:
+      - "1080:1080"
+      - "1025:1025"

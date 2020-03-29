@@ -21,22 +21,22 @@ func NewAccountInteractor(accountRepository AccountRepository, authenticationCod
 	return &accountInteractor
 }
 
-func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Account) error {
+func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Account) (string, error) {
 	err := interactor.AccountRepository.TemporaryStore(account)
 	if err != nil {
-		return err
+		return "", err
 	}
 	rand.Seed(time.Now().UnixNano())
-	code := rand.Intn(9000) + 1000 
+	code := rand.Intn(90000000) + 10000000 
 	authentication := domain.AuthenticationCode {
 		ID: account.ID,
 		Code: strconv.Itoa(code),
 	}
 	err = interactor.AuthenticationCodeRepository.Store(authentication)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return err
+	return authentication.Code, err
 }
 
 func (interactor *AccountInteractor) FindTemporaryAccount(id string) (domain.Account, error) {

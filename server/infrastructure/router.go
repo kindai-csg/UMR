@@ -12,7 +12,8 @@ func init() {
 
 	ldapHandler := NewLdapHandler()
 	redisHandler := NewRedisHandler()
-	accountController := controllers.NewAccountController(ldapHandler, redisHandler)
+	mailHandler := NewMailHandler()
+	accountController := controllers.NewAccountController(ldapHandler, redisHandler, mailHandler)
 	settingController := controllers.NewSettingController(redisHandler)
 	authenticationController := controllers.NewAuthenticationController(redisHandler)
 
