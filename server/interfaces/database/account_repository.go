@@ -77,3 +77,47 @@ func (repo *AccountRepository) GetAllUserID() ([]string, error) {
 	}
 	return tmpIds, nil
 }
+
+func (repo *AccountRepository) GetAllAccounts() ([]domain.Account, error) {
+	account_data, err := repo.LdapHandler.SearchRequest("*", []string { "cn", "displayName", "mail", "uid", "dn" })
+	if err != nil {
+		return nil, err
+	}
+	accounts := []domain.Account {}
+	for _, account := range account_data {
+		accounts = append(accounts, domain.Account {
+			ID: account[0],
+			Name: account[1],
+			EmailAddress: account[2],
+			StudentNumber: account[3],
+			AccountType: account[4],
+		})
+	}
+	return accounts, nil
+}
+
+func (repo *AccountRepository) GetAllNonActiveAccountID() ([]string, error) {
+	tmps, err := repo.RedisHandler.GetKeys("tmp_*")
+	if err != nil {
+		return nil, err
+	}
+	auths, err := repo.RedisHandler.GetKeys("auth_*")
+	if err != nil {
+		return nil, err
+	}
+	accounts := []string {}
+	for _, tmp := range tmps {
+		id := strings.Replace(tmp, "tmp_", "", 1)
+		isAuth := false
+		for _, auth := range auths {
+			if id == strings.Replace(auth, "auth_", "", 1) {
+				isAuth = true
+				break
+			} 
+		}
+		if !isAuth {
+			accounts = append(accounts, id)
+		}
+	}
+	return accounts, nil
+} 

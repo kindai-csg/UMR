@@ -11,5 +11,3 @@ type Account struct {
 	GroupIdNumber string
 	HomeDirectory  string
 }
-
-type Accounts []Account

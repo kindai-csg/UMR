@@ -21,22 +21,22 @@ func NewAccountInteractor(accountRepository AccountRepository, authenticationCod
 	return &accountInteractor
 }
 
-func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Account) error {
+func (interactor *AccountInteractor ) TemporaryRegistration(account domain.Account) (string, error) {
 	err := interactor.AccountRepository.TemporaryStore(account)
 	if err != nil {
-		return err
+		return "", err
 	}
 	rand.Seed(time.Now().UnixNano())
-	code := rand.Intn(9000) + 1000 
+	code := rand.Intn(90000000) + 10000000 
 	authentication := domain.AuthenticationCode {
 		ID: account.ID,
 		Code: strconv.Itoa(code),
 	}
 	err = interactor.AuthenticationCodeRepository.Store(authentication)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return err
+	return authentication.Code, err
 }
 
 func (interactor *AccountInteractor) FindTemporaryAccount(id string) (domain.Account, error) {
@@ -85,4 +85,37 @@ func (interactor *AccountInteractor) DuplicateCheck(id string) error {
 		}
 	}
 	return nil
+}
+
+func (interactor *AccountInteractor) GetAllAccounts() ([]domain.Account, error) {
+	accounts, err := interactor.AccountRepository.GetAllAccounts()
+	if err != nil {
+		return []domain.Account {}, err
+	}
+	return accounts, nil
+}
+
+func (interactor *AccountInteractor) GetAllNonActiveAccountID() ([]domain.Account, error) {
+	ids, err := interactor.AccountRepository.GetAllNonActiveAccountID()
+	if err != nil {
+		return nil, err
+	}
+	accounts := []domain.Account {}
+	for _, id := range ids {
+		accounts = append(accounts, domain.Account { ID: id })
+	}
+	return accounts, nil
+}
+
+func (interactor *AccountInteractor) AuthenticationCheck(id string) (error) {
+	ids, err := interactor.AccountRepository.GetAllNonActiveAccountID()
+	if err != nil {
+		return err
+	}
+	for _, _id := range ids {
+		if id == _id {
+			return nil
+		} 
+	}
+	return errors.New("認証が完了していないアカウントです")
 }

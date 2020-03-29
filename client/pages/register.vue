@@ -71,8 +71,9 @@ export default {
             return "半角英数字のみで入力してください"
         },
         mail_check: value => {
-          if (!value.match(/.+@.+\..+/) || !value.match(/^[A-Za-z0-9@.+]*$/))
-            return "メールアドレスを入力してください"
+          const studentNumberReg = new RegExp(this.studentnumber+".@kindai.ac.jp")
+          if (!value.match(studentNumberReg) || !value.match(/^[A-Za-z0-9@.+]*$/))
+            return "大学から交付されたメールアドレスを入力してください"
         }
       }
   },

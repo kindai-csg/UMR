@@ -24,7 +24,7 @@ services:
     depends_on:
       - ldap
       - redis
-      - mysql
+      - smtp
     tty: true
   client:
     build: ./nodejs
@@ -54,14 +54,10 @@ services:
       - "6379:6379"
     volumes:
       - "./redis:/data"
-  mysql:
-    image: mysql:5.7
-    container_name: umr-mysql 
+  smtp:
+    image: schickling/mailcatcher
+    container_name: umr-smtp
     restart: always
-    volumes:
-        - "./mysql:/var/lib/mysql"
     ports:
-        - "3306:3306"
-    environment:
-        - MYSQL_ROOT_PASSWORD=densan
-    
+      - "1080:1080"
+      - "1025:1025"
