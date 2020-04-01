@@ -23,6 +23,10 @@ func (repo *AccountRepository) TemporaryStore(account domain.Account) error {
 	if err != nil {
 		return err
 	}
+	err = repo.RedisHandler.ExpireKey("tmp_"+account.ID, 1800)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -59,7 +63,6 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 	if   err != nil {
 		return err
 	}
-	_ = repo.RedisHandler.MultiDel([]string { "auth_"+account.ID, "count_"+account.ID  })
 	return nil
 }
 

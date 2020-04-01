@@ -53,6 +53,10 @@ func (interactor *AccountInteractor) AuthenticationTemporaryAccount(clientAuth d
 		return err
 	}
 	if serverAuth.Code == clientAuth.Code {
+		err = interactor.AuthenticationCodeRepository.DeleteAuthData(clientAuth.ID)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 	err = interactor.AuthenticationCodeRepository.IncFailureCount(clientAuth.ID)
