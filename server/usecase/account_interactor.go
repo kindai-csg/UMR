@@ -123,3 +123,11 @@ func (interactor *AccountInteractor) AuthenticationCheck(id string) (error) {
 	}
 	return errors.New("認証が完了していないアカウントです")
 }
+
+func (interactor *AccountInteractor) DeleteAccount(id string) (error) {
+	err := interactor.AccountRepository.DeleteAccount(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

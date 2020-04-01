@@ -57,7 +57,12 @@ func (handler *LdapHandler) UpdateRequest(id string, request []string) error {
 	return nil
 }
 
-func (handler *LdapHandler) DeleteRequest(id string) error {
+func (handler *LdapHandler) DeleteRequest(cn string) error {
+	delRequest := ldap.NewDelRequest(cn, nil)
+	err := handler.connection.Del(delRequest)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

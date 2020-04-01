@@ -9,4 +9,5 @@ type AccountRepository interface {
 	GetAllUserID() ([]string, error)
 	GetAllAccounts() ([]domain.Account, error)
 	GetAllNonActiveAccountID() ([]string, error)
+	DeleteAccount(id string) (error)
 }

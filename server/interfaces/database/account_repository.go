@@ -3,6 +3,7 @@ package database
 import (
 	"github.com/kindaidensan/UMR/domain" 
 	"strings"
+	"fmt"
 )
 
 type AccountRepository struct {
@@ -124,3 +125,12 @@ func (repo *AccountRepository) GetAllNonActiveAccountID() ([]string, error) {
 	}
 	return accounts, nil
 } 
+
+func (repo *AccountRepository) DeleteAccount(id string) error {
+	fmt.Println(id)
+	err := repo.LdapHandler.DeleteRequest("cn="+id+",ou=account,dc=kindai-csg,dc=dev")
+	if err != nil {
+		return err
+	}
+	return nil
+}
