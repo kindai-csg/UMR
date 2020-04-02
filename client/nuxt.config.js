@@ -44,6 +44,8 @@ export default {
     '@nuxtjs/axios',
   ],
   axios: {
+    baseURL: 'http://nginx',
+    browserBaseURL: 'http://localhost:3080',
   },
   /*
   ** vuetify module configuration
