@@ -81,6 +81,14 @@ func (handler *RedisHandler) ExpireSetKey(key string, value string, second int) 
 	return nil
 }
 
+func (handler *RedisHandler) ExpireKey(key string, second int) error {
+	_, err := handler.connection.Do("EXPIRE", key, second)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (handler *RedisHandler) GetTtl(key string) (int, error) {
 	ttl, err := redis.Int(handler.connection.Do("TTL", key))
 	if err != nil {

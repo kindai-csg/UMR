@@ -107,3 +107,13 @@ func (controller *AccountController) GetAllNonActiveAccountID(c Context) {
 	}
 	c.JSON(200, accounts)
 }
+
+func (controller *AccountController) DeleteAccount(c Context) {
+	id := c.PostForm("ID")
+	err := controller.interactor.DeleteAccount(id)
+	if err != nil {
+		c.JSON(500, NewMsg(err.Error()))
+		return
+	}
+	c.JSON(200, NewMsg("success"))
+}

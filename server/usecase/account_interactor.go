@@ -53,6 +53,10 @@ func (interactor *AccountInteractor) AuthenticationTemporaryAccount(clientAuth d
 		return err
 	}
 	if serverAuth.Code == clientAuth.Code {
+		err = interactor.AuthenticationCodeRepository.DeleteAuthData(clientAuth.ID)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 	err = interactor.AuthenticationCodeRepository.IncFailureCount(clientAuth.ID)
@@ -118,4 +122,12 @@ func (interactor *AccountInteractor) AuthenticationCheck(id string) (error) {
 		} 
 	}
 	return errors.New("認証が完了していないアカウントです")
+}
+
+func (interactor *AccountInteractor) DeleteAccount(id string) (error) {
+	err := interactor.AccountRepository.DeleteAccount(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

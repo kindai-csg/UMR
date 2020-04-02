@@ -23,6 +23,10 @@ func (repo *AccountRepository) TemporaryStore(account domain.Account) error {
 	if err != nil {
 		return err
 	}
+	err = repo.RedisHandler.ExpireKey("tmp_"+account.ID, 1800)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -59,7 +63,6 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 	if   err != nil {
 		return err
 	}
-	_ = repo.RedisHandler.MultiDel([]string { "auth_"+account.ID, "count_"+account.ID  })
 	return nil
 }
 
@@ -121,3 +124,11 @@ func (repo *AccountRepository) GetAllNonActiveAccountID() ([]string, error) {
 	}
 	return accounts, nil
 } 
+
+func (repo *AccountRepository) DeleteAccount(id string) error {
+	err := repo.LdapHandler.DeleteRequest("cn="+id+",ou=account,dc=kindai-csg,dc=dev")
+	if err != nil {
+		return err
+	}
+	return nil
+}

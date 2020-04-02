@@ -30,7 +30,17 @@
           :items="accounts_desserts"
           :items-per-page="5"
           class="elevation-1"
-        />
+        >
+          <template v-slot:item.actions="{ item }">
+            <v-icon
+              small
+              class="mr-2"
+              @click="delete_account(item)"
+            >
+              mdi-delete
+            </v-icon>
+          </template>
+        </v-data-table>
       </v-expansion-panel-content>
     </v-expansion-panel>
     <v-expansion-panel>
@@ -86,6 +96,11 @@ export default {
           text: "メールアドレス",
           value: "EmailAddress",
         },
+        {
+          text: "アクション",
+          value: 'actions',
+          sortable: false,
+        }
       ],
       accounts_desserts: [],
       activate_headers: [
@@ -164,6 +179,20 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    delete_account(account) {
+      const params = new URLSearchParams()
+      console.log(account)
+      params.append('ID', account.ID)
+      this.$axios.$post('/api/admin/delete_account', params)
+        .then(() => {
+          const index = this.accounts_desserts.indexOf(account)
+          this.accounts_desserts.splice(index, 1)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+
     }
   }
 }
