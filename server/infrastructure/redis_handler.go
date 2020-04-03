@@ -2,25 +2,35 @@ package infrastructure
 
 import (
 	"github.com/garyburd/redigo/redis"
+	"time"
 )
 
 type RedisHandler struct {
-	connection redis.Conn
+	// connection redis.Conn
+	pool *redis.Pool
 }
 
 func NewRedisHandler() *RedisHandler {
-	connection, err := redis.Dial("tcp", "redis:6379")
-	if err != nil {
-		return nil
-	}
+	// connection, err := redis.Dial("tcp", "redis:6379")
+	// if err != nil {
+	// 	return nil
+	// }
 	redisHandler := RedisHandler {
-		connection: connection,
+		pool: &redis.Pool {
+			MaxIdle: 3,
+			MaxActive: 0,
+			IdleTimeout: 240 * time.Second,
+			Dial: func() (redis.Conn, error) { return redis.Dial("tcp", "redis:6379") },
+		},
 	}
 	return &redisHandler
-} 
+}
 
 func (handler *RedisHandler) Set(key string, value string) error {
-	_, err := handler.connection.Do("SET", key, value)
+	conn := handler.pool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("SET", key, value)
 	if err != nil {
 		return err
 	}
@@ -28,7 +38,10 @@ func (handler *RedisHandler) Set(key string, value string) error {
 }
 
 func (handler *RedisHandler) Get(key string) (string, error) {
-	value, err := redis.String(handler.connection.Do("GET", key))
+	conn := handler.pool.Get()
+	defer conn.Close()
+
+	value, err := redis.String(conn.Do("GET", key))
 	if  err != nil {
 		return value, err
 	}
@@ -36,7 +49,10 @@ func (handler *RedisHandler) Get(key string) (string, error) {
 }
 
 func (handler *RedisHandler) Del(key string) error {
-	_, err := handler.connection.Do("DEL", key)
+	conn := handler.pool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("DEL", key)
 	if err != nil {
 		return err
 	}
@@ -44,17 +60,20 @@ func (handler *RedisHandler) Del(key string) error {
 }
 
 func (handler *RedisHandler) MultiDel(keys []string) error {
-	err := handler.connection.Send("MULTI")
+	conn := handler.pool.Get()
+	defer conn.Close()
+
+	err := conn.Send("MULTI")
 	if err != nil {
 		return err
 	}
 	for _, key := range keys {
-		err = handler.connection.Send("DEL", key)
+		err = conn.Send("DEL", key)
 		if err != nil {
 			return err
 		}
 	}
-	_, err = handler.connection.Do("EXEC")
+	_, err = conn.Do("EXEC")
 	if err != nil {
 		return err
 	}
@@ -62,19 +81,22 @@ func (handler *RedisHandler) MultiDel(keys []string) error {
 }
 
 func (handler *RedisHandler) ExpireSetKey(key string, value string, second int) error {
-	err := handler.connection.Send("MULTI")
+	conn := handler.pool.Get()
+	defer conn.Close()
+
+	err := conn.Send("MULTI")
 	if err != nil {
 		return err
 	}
-	err = handler.connection.Send("SET", key, value)
+	err = conn.Send("SET", key, value)
 	if err != nil {
 		return err
 	}
-	err = handler.connection.Send("EXPIRE", key, second)
+	err = conn.Send("EXPIRE", key, second)
 	if err != nil {
 		return err
 	}
-	_, err = handler.connection.Do("EXEC")
+	_, err = conn.Do("EXEC")
 	if err != nil {
 		return err
 	}
@@ -82,7 +104,10 @@ func (handler *RedisHandler) ExpireSetKey(key string, value string, second int) 
 }
 
 func (handler *RedisHandler) ExpireKey(key string, second int) error {
-	_, err := handler.connection.Do("EXPIRE", key, second)
+	conn := handler.pool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("EXPIRE", key, second)
 	if err != nil {
 		return err
 	}
@@ -90,7 +115,10 @@ func (handler *RedisHandler) ExpireKey(key string, second int) error {
 }
 
 func (handler *RedisHandler) GetTtl(key string) (int, error) {
-	ttl, err := redis.Int(handler.connection.Do("TTL", key))
+	conn := handler.pool.Get()
+	defer conn.Close()
+
+	ttl, err := redis.Int(conn.Do("TTL", key))
 	if err != nil {
 		return -1, err
 	}
@@ -98,8 +126,11 @@ func (handler *RedisHandler) GetTtl(key string) (int, error) {
 }
 
 func (handler *RedisHandler) RPush(key string, values []string) error {
+	conn := handler.pool.Get()
+	defer conn.Close()
+
 	for _, value := range values {
-		_, err := handler.connection.Do("RPUSH", key, value)
+		_, err := conn.Do("RPUSH", key, value)
 		if err != nil {
 			return err
 		}
@@ -108,9 +139,12 @@ func (handler *RedisHandler) RPush(key string, values []string) error {
 }
 
 func (handler *RedisHandler) LPop(key string, number int) ([]string, error) {
+	conn := handler.pool.Get()
+	defer conn.Close()
+
 	result := []string{}
 	for i := 0; i < number; i++ {
-		value, err := redis.String(handler.connection.Do("LPOP", key))	
+		value, err := redis.String(conn.Do("LPOP", key))	
 		if err != nil {
 			return result, err
 		}
@@ -120,7 +154,10 @@ func (handler *RedisHandler) LPop(key string, number int) ([]string, error) {
 }
 
 func (handler *RedisHandler) GetKeys(key string) ([]string, error) {
-	keys, err := redis.Values(handler.connection.Do("keys", key))
+	conn := handler.pool.Get()
+	defer conn.Close()
+
+	keys, err := redis.Values(conn.Do("keys", key))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +173,10 @@ func (handler *RedisHandler) GetKeys(key string) ([]string, error) {
 }
 
 func (handler *RedisHandler) Incr(key string) (int, error) {
-	value, err := redis.Int(handler.connection.Do("INCR", key))
+	conn := handler.pool.Get()
+	defer conn.Close()
+
+	value, err := redis.Int(conn.Do("INCR", key))
 	if err != nil {
 		return -1, err
 	}
