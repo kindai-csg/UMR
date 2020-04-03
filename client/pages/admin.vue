@@ -136,7 +136,7 @@ export default {
         this.accounts_desserts = result
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error.response.data.Msg)
       })
 
     this.$axios.$post('/api/admin/get_all_non_active_account_id')
@@ -145,7 +145,7 @@ export default {
         this.activate_desserts = result
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error.response.data.Msg)
       })
   },
   methods: {
@@ -177,7 +177,7 @@ export default {
           this.activate_desserts.splice(index, 1)
         })
         .catch((error) => {
-          console.log(error)
+          console.log(error.response.data.Msg)
         })
     },
     delete_account(account) {
@@ -190,7 +190,7 @@ export default {
           this.accounts_desserts.splice(index, 1)
         })
         .catch((error) => {
-          console.log(error)
+          console.log(error.response.data.Msg)
         })
 
     }
