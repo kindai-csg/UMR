@@ -6,6 +6,8 @@ import (
 	"time"
 	"strconv"
 	"errors"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 type AccountInteractor struct {
@@ -138,7 +140,8 @@ func (interactor *AccountInteractor) AuthenticationAdminAccount(account domain.A
 		return err
 	}
 	for _, a := range accounts {
-		if a.ID == account.ID && a.Password == account.Password {
+		md5 := md5.Sum([]byte(account.Password))
+		if a.ID == account.ID && a.Password == hex.EncodeToString(md5[:]) {
 			return nil
 		}
 	}
