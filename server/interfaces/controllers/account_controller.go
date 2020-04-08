@@ -11,12 +11,13 @@ type AccountController struct {
 	mail MailHandler
 }
 
-func NewAccountController(ldapHandler database.LdapHandler, redisHandler database.RedisHandler, mailHandler MailHandler) *AccountController {
+func NewAccountController(ldapHandler database.LdapHandler, redisHandler database.RedisHandler, mailHandler MailHandler, sqlHandler database.SqlHandler) *AccountController {
 	accountController := AccountController {
 		interactor: usecase.AccountInteractor {
 			AccountRepository: &database.AccountRepository {
 				LdapHandler: ldapHandler,
 				RedisHandler: redisHandler,
+				SqlHandler: sqlHandler,
 			},
 			AuthenticationCodeRepository: &database.AuthenticationCodeRepository {
 				RedisHandler: redisHandler,
@@ -111,6 +112,17 @@ func (controller *AccountController) GetAllNonActiveAccountID(c Context) {
 func (controller *AccountController) DeleteAccount(c Context) {
 	id := c.PostForm("ID")
 	err := controller.interactor.DeleteAccount(id)
+	if err != nil {
+		c.JSON(500, NewMsg(err.Error()))
+		return
+	}
+	c.JSON(200, NewMsg("success"))
+}
+
+func (controller *AccountController) Login(c Context) {
+	account := domain.AdminAccount{}
+	c.Bind(&account)
+	err := controller.interactor.AuthenticationAdminAccount(account)
 	if err != nil {
 		c.JSON(500, NewMsg(err.Error()))
 		return

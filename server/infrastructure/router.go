@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/kindaidensan/UMR/interfaces/controllers"
+	"os"
 )
 
 var Router *gin.Engine
@@ -13,7 +14,12 @@ func init() {
 	ldapHandler := NewLdapHandler()
 	redisHandler := NewRedisHandler()
 	mailHandler := NewMailHandler()
-	accountController := controllers.NewAccountController(ldapHandler, redisHandler, mailHandler)
+	sqlHandler := NewSqlHandler()
+	if sqlHandler == nil {
+		os.Exit(1);
+	}
+
+	accountController := controllers.NewAccountController(ldapHandler, redisHandler, mailHandler, sqlHandler)
 	settingController := controllers.NewSettingController(redisHandler)
 	authenticationController := controllers.NewAuthenticationController(redisHandler)
 
@@ -34,6 +40,7 @@ func init() {
 	})
 
 	router.POST("/authentication", func(c *gin.Context) {accountController.AuthenticationCreate(c)})
+	router.POST("/login", func(c *gin.Context) {accountController.Login(c)})
 
 	Router = router
 }

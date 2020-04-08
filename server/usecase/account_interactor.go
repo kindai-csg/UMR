@@ -131,3 +131,16 @@ func (interactor *AccountInteractor) DeleteAccount(id string) (error) {
 	}
 	return nil
 }
+
+func (interactor *AccountInteractor) AuthenticationAdminAccount(account domain.AdminAccount) (error) {
+	accounts, err := interactor.AccountRepository.GetAdminAccounts()
+	if err != nil {
+		return err
+	}
+	for _, a := range accounts {
+		if a.ID == account.ID && a.Password == account.Password {
+			return nil
+		}
+	}
+	return errors.New("IDかPasswordが間違っています")
+}

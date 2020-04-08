@@ -3,17 +3,20 @@ package database
 import (
 	"github.com/kindaidensan/UMR/domain" 
 	"strings"
+	// "database/sql"
 )
 
 type AccountRepository struct {
 	LdapHandler LdapHandler
 	RedisHandler RedisHandler
+	SqlHandler SqlHandler
 }
 
-func NewAccountRepository(ldapHandler LdapHandler, redisHandler RedisHandler) *AccountRepository {
+func NewAccountRepository(ldapHandler LdapHandler, redisHandler RedisHandler, sqlHandler SqlHandler) *AccountRepository {
 	accountRepository := AccountRepository {
 		LdapHandler: ldapHandler,
 		RedisHandler: redisHandler,
+		SqlHandler: sqlHandler,
 	}
 	return &accountRepository
 }
@@ -131,4 +134,25 @@ func (repo *AccountRepository) DeleteAccount(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (repo *AccountRepository) GetAdminAccounts() ([]domain.AdminAccount, error) {
+	rows, err := repo.SqlHandler.Query("select * from admin")
+	if err != nil {
+		return nil, err
+	}
+
+	accounts := []domain.AdminAccount {}
+	for rows.Next() {
+		var id string 
+		var password string
+		if err := rows.Scan(&id, &password); err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, domain.AdminAccount {
+			ID: id,
+			Password: password,
+		})
+	}
+	return accounts, nil 
 }
