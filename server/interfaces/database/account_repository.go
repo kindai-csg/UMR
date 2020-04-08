@@ -4,6 +4,8 @@ import (
 	"github.com/kindaidensan/UMR/domain" 
 	"strings"
 	// "database/sql"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 type AccountRepository struct {
@@ -48,6 +50,7 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 	} else {
 		ou = "ou=account"
 	}
+	md5 := md5.Sum([]byte(account.Password))
 	request := []string {
 		"dn", "cn="+account.ID+","+ou+",dc=kindai-csg,dc=dev",
 		"objectClass", "posixAccount",
@@ -57,7 +60,7 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 		"uidNumber", account.UserIdNumber,
 		"gidNumber", account.GroupIdNumber,
 		"homeDirectory", account.HomeDirectory,
-		"userPassword", account.Password,
+		"userPassword", "{MD5}"+hex.EncodeToString(md5[:]),
 		"sn", account.Name,
 		"displayName", account.Name,
 		"mail", account.EmailAddress,
