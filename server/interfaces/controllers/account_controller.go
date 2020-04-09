@@ -119,13 +119,13 @@ func (controller *AccountController) DeleteAccount(c Context) {
 	c.JSON(200, NewMsg("success"))
 }
 
-func (controller *AccountController) Login(c Context) {
-	account := domain.AdminAccount{}
-	c.Bind(&account)
-	err := controller.interactor.AuthenticationAdminAccount(account)
+func (controller *AccountController) Login(id string, password string) error {
+	err := controller.interactor.AuthenticationAdminAccount(domain.AdminAccount{
+		ID: id,
+		Password: password,
+	})
 	if err != nil {
-		c.JSON(500, NewMsg(err.Error()))
-		return
+		return err
 	}
-	c.JSON(200, NewMsg("success"))
+	return nil
 }

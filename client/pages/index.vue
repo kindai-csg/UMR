@@ -45,9 +45,15 @@ export default {
     }
   },
   methods: {
-    login() {
-      if (this.$refs.login_form.validate()) {
-        console.log('login')
+    async login() {
+      // if (this.$refs.login_form.validate()) {
+      //   console.log('login')
+      // }
+      try {
+        await this.$auth.loginWith('local', { data: { ID: this.id, Password: this.password } });
+      } catch (error) {
+        console.log('errorだよ')
+        console.log(error)
       }
     }
   }

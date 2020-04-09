@@ -42,10 +42,28 @@ export default {
   */
   modules: [
     '@nuxtjs/axios',
+    '@nuxtjs/auth',
   ],
   axios: {
     baseURL: 'http://nginx',
     browserBaseURL: 'http://localhost:3080',
+  },
+  auth: {
+    redirect: {
+      login: '/', 
+      logout: '/',
+      callback: false,
+      home: '/admin'
+    },
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: '/api/login', method: 'post', propertyName: 'token' },
+          logout: false,
+          user: false
+        }
+      }
+    }
   },
   /*
   ** vuetify module configuration

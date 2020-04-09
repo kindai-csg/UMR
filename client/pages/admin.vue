@@ -1,5 +1,11 @@
 <template>
   <v-expansion-panels>
+    <v-card>
+      <v-card-title>アカウント管理画面</v-card-title>
+      <v-card-text>
+        <button @click="logout">Logout</button>
+      </v-card-text>
+    </v-card>
     <v-expansion-panel>
       <v-expansion-panel-header>登録フォーム管理</v-expansion-panel-header>
       <v-expansion-panel-content>
@@ -149,6 +155,9 @@ export default {
       })
   },
   methods: {
+    logout() {
+      this.$auth.logout()
+    },
     create_form() {
       if (this.$refs.create_form.validate()) {
         const params = new URLSearchParams()
