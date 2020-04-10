@@ -6,7 +6,7 @@ type Account struct {
 	Name string `validate:"required"`
 	EmailAddress string `validate:"required,email"`
 	StudentNumber string `validate:"required,numeric"`
-	AccountType string `validate:"required,eq=Regular"`
+	AccountType string
 	UserIdNumber string
 	GroupIdNumber string
 	HomeDirectory  string
