@@ -6,23 +6,45 @@ import (
 	"github.com/kindaidensan/UMR/interfaces/controllers"
 	// jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/BurntSushi/toml"
 	"strings"
 	"time"
 	"os"
 	"log"
 )
 
+type Config struct {
+	LdapConfig LdapConfig
+	RedisConfig RedisConfig
+	SqlConfig SqlConfig
+	MailConfig MailConfig
+	JWTConfig JWTConfig
+}
+
+type JWTConfig struct {
+	Secret string  `toml:"secret"`
+}
+
 var Router *gin.Engine
 
 func init() {
+	var config Config
+	_, err := toml.DecodeFile("config.toml", &config)
+	if err != nil {
+		panic(err)
+	}
+
 	router := gin.Default()
 
-	ldapHandler := NewLdapHandler()
-	redisHandler := NewRedisHandler()
-	mailHandler := NewMailHandler()
-	sqlHandler := NewSqlHandler()
+	redisHandler := NewRedisHandler(config.RedisConfig)
+	mailHandler := NewMailHandler(config.MailConfig)
+	sqlHandler := NewSqlHandler(config.SqlConfig)
+	ldapHandler := NewLdapHandler(config.LdapConfig)
+	if ldapHandler == nil {
+		os.Exit(1)
+	}
 	if sqlHandler == nil {
-		os.Exit(1);
+		os.Exit(2);
 	}
 
 	accountController := controllers.NewAccountController(ldapHandler, redisHandler, mailHandler, sqlHandler)
@@ -35,7 +57,7 @@ func init() {
 		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 		
 		_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte("test"), nil
+			return []byte(config.JWTConfig.Secret), nil
 		});
 
 		if err != nil {
@@ -78,7 +100,7 @@ func init() {
 		claims := token.Claims.(jwt.MapClaims)
 		claims["ID"] = account.ID
 		claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-		tokenString, _ := token.SignedString([]byte("test"))
+		tokenString, _ := token.SignedString([]byte(config.JWTConfig.Secret))
 		c.JSON(200, gin.H{
 			"token": tokenString,
 		})

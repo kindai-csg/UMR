@@ -10,11 +10,18 @@ type MailHandler struct {
 	auth smtp.Auth
 }
 
-func NewMailHandler() *MailHandler {
+type MailConfig struct {
+	From string  `toml:"From"`
+	Host string  `toml:"Host"`
+	User string  `toml:"User"`
+	Password string  `toml:"Password"`
+}
+
+func NewMailHandler(config MailConfig) *MailHandler {
 	mailHandler := MailHandler {
-		from: "admin@kindai-csg.dev",
-		host: "smtp",
-		auth: smtp.PlainAuth("", "admin", "password", "smtp"),
+		from: config.From,
+		host: config.Host,
+		auth: smtp.PlainAuth("", config.User, config.Password, "smtp"),
 	}
 	return &mailHandler
 }
