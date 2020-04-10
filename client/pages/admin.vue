@@ -1,76 +1,92 @@
 <template>
-  <v-expansion-panels>
-    <v-card>
-      <v-card-title>アカウント管理画面</v-card-title>
-      <v-card-text>
-        <button @click="logout">Logout</button>
-      </v-card-text>
-    </v-card>
-    <v-expansion-panel>
-      <v-expansion-panel-header>登録フォーム管理</v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <v-alert type="error" v-if="form_error">
-          {{ form_error }}
-        </v-alert>
-        <div v-if="form_url&&form_time">
-          フォームURL: {{ form_url }}
+  <v-layout
+    column
+    justify-center
+    align-center
+  >
+    <v-flex
+      xs12
+      sm8
+      md6
+    >
+      <v-card>
+        <v-card-title>アカウント管理画面</v-card-title>
+        <v-card-text>
+          <button @click="logout">Logout</button>
+        </v-card-text>
+      </v-card>
+      <br>
+      <br>
+      <v-card>
+        <v-card-title>登録フォーム管理</v-card-title>
+        <v-card-text>
+          <v-alert type="error" v-if="form_error">
+            {{ form_error }}
+          </v-alert>
+          <div v-if="form_url&&form_time">
+            フォームURL: {{ form_url }}
+            <br>
+            残り時間: {{ form_time }} 秒 
+          </div>
           <br>
-          残り時間: {{ form_time }} 秒 
-        </div>
-        <br>
-        <v-form ref="create_form">
-          <v-text-field
-          v-model="new_form_time"
-          label="有効期限(秒)"
-          :rules="[required, number_check]"
-          />
-          <v-btn text v-on:click="create_form">作成</v-btn>
-        </v-form>
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-    <v-expansion-panel>
-      <v-expansion-panel-header>アカウント管理</v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <v-data-table
-          :headers="accounts_headers"
-          :items="accounts_desserts"
-          :items-per-page="5"
-          class="elevation-1"
-        >
-          <template v-slot:item.actions="{ item }">
-            <v-icon
-              small
-              class="mr-2"
-              @click="delete_account(item)"
-            >
-              mdi-delete
-            </v-icon>
-          </template>
-        </v-data-table>
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-    <v-expansion-panel>
-      <v-expansion-panel-header>アカウントアクティベート</v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <v-data-table
-          :headers="activate_headers"
-          :items="activate_desserts"
-          :items-per-page="5"
-          class="elevation-1"
-        >
-          <template v-slot:item.actions="{ item }">
-            <v-icon
-              small
-              class="mr-2"
-              @click="activate_item(item)"
-            >
-              mdi-account-check
-            </v-icon>
-          </template>
-        </v-data-table>
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-  </v-expansion-panels>
+          <v-form ref="create_form">
+            <v-text-field
+            v-model="new_form_time"
+            label="有効期限(秒)"
+            :rules="[required, number_check]"
+            />
+            <v-btn text v-on:click="create_form">作成</v-btn>
+          </v-form>
+        </v-card-text>
+      </v-card>
+      <br>
+      <br>
+      <v-card>
+        <v-card-title>アカウント管理</v-card-title>
+        <v-card-text>
+          <v-data-table
+            :headers="accounts_headers"
+            :items="accounts_desserts"
+            :items-per-page="5"
+            class="elevation-1"
+          >
+            <template v-slot:item.actions="{ item }">
+              <v-icon
+                small
+                class="mr-2"
+                @click="delete_account(item)"
+              >
+                mdi-delete
+              </v-icon>
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
+      <br>
+      <br>
+      <v-card>
+        <v-card-title>アカウントアクティベイト</v-card-title>
+        <v-card-text>
+          <v-data-table
+            :headers="activate_headers"
+            :items="activate_desserts"
+            :items-per-page="5"
+            class="elevation-1"
+          >
+            <template v-slot:item.actions="{ item }">
+              <v-icon
+                small
+                class="mr-2"
+                @click="activate_item(item)"
+              >
+                mdi-account-check
+              </v-icon>
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
@@ -123,6 +139,11 @@ export default {
         }
       ],
       activate_desserts: [],
+    }
+  },
+  head() {
+    return {
+      title: 'アカウント管理画面',
     }
   },
   created() {

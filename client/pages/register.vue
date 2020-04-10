@@ -77,6 +77,11 @@ export default {
         }
       }
   },
+  head() {
+    return {
+      title: '新規登録',
+    }
+  },
   methods: {
     submit() {
       if (this.$refs.register_form.validate()) {
@@ -90,7 +95,7 @@ export default {
         this.$axios.$post('/api/register', params)
           .then((result) => {
             console.log(result)
-            this.$router.push('/?action=register')
+            this.$router.push('/thanks')
           })
           .catch((e) => {
             if (e.response) {

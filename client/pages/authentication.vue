@@ -15,6 +15,11 @@ export default {
       resultInfo: "",
     }
   },
+  head() {
+    return {
+      title: 'メール認証',
+    }
+  },
   mounted() {
     const params = new URLSearchParams()
     params.append('ID', this.$route.query.id)

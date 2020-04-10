@@ -35,6 +35,11 @@ export default {
       success: '',
     }
   },
+  head() {
+    return {
+      title: 'ログイン',
+    }
+  },
   mounted() {
     if (this.$route.query.action) {
       switch (this.$route.query.action) {
