@@ -75,6 +75,7 @@
 
 <script>
 export default {
+  middleware: 'auth',
   data() {
     return {
       new_form_time: 600,
