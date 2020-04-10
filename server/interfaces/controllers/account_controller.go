@@ -11,12 +11,13 @@ type AccountController struct {
 	mail MailHandler
 }
 
-func NewAccountController(ldapHandler database.LdapHandler, redisHandler database.RedisHandler, mailHandler MailHandler) *AccountController {
+func NewAccountController(ldapHandler database.LdapHandler, redisHandler database.RedisHandler, mailHandler MailHandler, sqlHandler database.SqlHandler) *AccountController {
 	accountController := AccountController {
 		interactor: usecase.AccountInteractor {
 			AccountRepository: &database.AccountRepository {
 				LdapHandler: ldapHandler,
 				RedisHandler: redisHandler,
+				SqlHandler: sqlHandler,
 			},
 			AuthenticationCodeRepository: &database.AuthenticationCodeRepository {
 				RedisHandler: redisHandler,
@@ -116,4 +117,15 @@ func (controller *AccountController) DeleteAccount(c Context) {
 		return
 	}
 	c.JSON(200, NewMsg("success"))
+}
+
+func (controller *AccountController) Login(id string, password string) error {
+	err := controller.interactor.AuthenticationAdminAccount(domain.AdminAccount{
+		ID: id,
+		Password: password,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -26,7 +26,7 @@ export default {
       })
       .catch((err) => {
         this.result = "認証失敗"
-        console.log(err)
+        console.log(err.response.data.Msg)
       })
   },
 }

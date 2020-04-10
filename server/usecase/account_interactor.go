@@ -6,6 +6,8 @@ import (
 	"time"
 	"strconv"
 	"errors"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 type AccountInteractor struct {
@@ -130,4 +132,18 @@ func (interactor *AccountInteractor) DeleteAccount(id string) (error) {
 		return err
 	}
 	return nil
+}
+
+func (interactor *AccountInteractor) AuthenticationAdminAccount(account domain.AdminAccount) (error) {
+	accounts, err := interactor.AccountRepository.GetAdminAccounts()
+	if err != nil {
+		return err
+	}
+	for _, a := range accounts {
+		md5 := md5.Sum([]byte(account.Password))
+		if a.ID == account.ID && a.Password == hex.EncodeToString(md5[:]) {
+			return nil
+		}
+	}
+	return errors.New("IDかPasswordが間違っています")
 }

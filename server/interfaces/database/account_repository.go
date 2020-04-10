@@ -3,17 +3,22 @@ package database
 import (
 	"github.com/kindaidensan/UMR/domain" 
 	"strings"
+	// "database/sql"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 type AccountRepository struct {
 	LdapHandler LdapHandler
 	RedisHandler RedisHandler
+	SqlHandler SqlHandler
 }
 
-func NewAccountRepository(ldapHandler LdapHandler, redisHandler RedisHandler) *AccountRepository {
+func NewAccountRepository(ldapHandler LdapHandler, redisHandler RedisHandler, sqlHandler SqlHandler) *AccountRepository {
 	accountRepository := AccountRepository {
 		LdapHandler: ldapHandler,
 		RedisHandler: redisHandler,
+		SqlHandler: sqlHandler,
 	}
 	return &accountRepository
 }
@@ -45,6 +50,7 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 	} else {
 		ou = "ou=account"
 	}
+	md5 := md5.Sum([]byte(account.Password))
 	request := []string {
 		"dn", "cn="+account.ID+","+ou+",dc=kindai-csg,dc=dev",
 		"objectClass", "posixAccount",
@@ -54,7 +60,7 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 		"uidNumber", account.UserIdNumber,
 		"gidNumber", account.GroupIdNumber,
 		"homeDirectory", account.HomeDirectory,
-		"userPassword", account.Password,
+		"userPassword", "{MD5}"+hex.EncodeToString(md5[:]),
 		"sn", account.Name,
 		"displayName", account.Name,
 		"mail", account.EmailAddress,
@@ -131,4 +137,25 @@ func (repo *AccountRepository) DeleteAccount(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (repo *AccountRepository) GetAdminAccounts() ([]domain.AdminAccount, error) {
+	rows, err := repo.SqlHandler.Query("select * from admin")
+	if err != nil {
+		return nil, err
+	}
+
+	accounts := []domain.AdminAccount {}
+	for rows.Next() {
+		var id string 
+		var password string
+		if err := rows.Scan(&id, &password); err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, domain.AdminAccount {
+			ID: id,
+			Password: password,
+		})
+	}
+	return accounts, nil 
 }

@@ -90,6 +90,7 @@ export default {
         this.$axios.$post('/api/register', params)
           .then((result) => {
             console.log(result)
+            this.$router.push('/?action=register')
           })
           .catch((e) => {
             if (e.response) {

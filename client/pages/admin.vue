@@ -1,5 +1,11 @@
 <template>
   <v-expansion-panels>
+    <v-card>
+      <v-card-title>アカウント管理画面</v-card-title>
+      <v-card-text>
+        <button @click="logout">Logout</button>
+      </v-card-text>
+    </v-card>
     <v-expansion-panel>
       <v-expansion-panel-header>登録フォーム管理</v-expansion-panel-header>
       <v-expansion-panel-content>
@@ -69,6 +75,7 @@
 
 <script>
 export default {
+  middleware: 'auth',
   data() {
     return {
       new_form_time: 600,
@@ -136,7 +143,7 @@ export default {
         this.accounts_desserts = result
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error.response.data.Msg)
       })
 
     this.$axios.$post('/api/admin/get_all_non_active_account_id')
@@ -145,10 +152,13 @@ export default {
         this.activate_desserts = result
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error.response.data.Msg)
       })
   },
   methods: {
+    logout() {
+      this.$auth.logout()
+    },
     create_form() {
       if (this.$refs.create_form.validate()) {
         const params = new URLSearchParams()
@@ -177,7 +187,7 @@ export default {
           this.activate_desserts.splice(index, 1)
         })
         .catch((error) => {
-          console.log(error)
+          console.log(error.response.data.Msg)
         })
     },
     delete_account(account) {
@@ -190,7 +200,7 @@ export default {
           this.accounts_desserts.splice(index, 1)
         })
         .catch((error) => {
-          console.log(error)
+          console.log(error.response.data.Msg)
         })
 
     }
