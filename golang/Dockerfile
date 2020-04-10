@@ -14,5 +14,6 @@ RUN go install github.com/golang/mock/mockgen
 RUN go get -v gopkg.in/go-playground/validator.v9
 RUN go get -v github.com/go-sql-driver/mysql
 RUN go get -v github.com/dgrijalva/jwt-go
+RUN go get -v github.com/BurntSushi/toml
 
 CMD ["go", "run", "main.go"]
