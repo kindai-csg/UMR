@@ -2,8 +2,8 @@
   <v-card>
     <v-card-title>Login</v-card-title>
     <v-card-text>
-       <v-alert type="success" v-if="success">
-        {{ success }}
+      <v-alert type="error" v-if="error">
+        {{ error }}
       </v-alert>
       <v-form ref="login_form">
         <v-text-field
@@ -32,28 +32,26 @@ export default {
       id: "",
       password: "",
       required: value => !!value || "必須項目です",
-      success: '',
+      error: '',
     }
   },
-  mounted() {
-    if (this.$route.query.action) {
-      switch (this.$route.query.action) {
-        case 'register':
-          this.success = '確認メールを送信しました.'
-          break
-      }
+  head() {
+    return {
+      title: 'ログイン',
     }
   },
   methods: {
     async login() {
-      // if (this.$refs.login_form.validate()) {
-      //   console.log('login')
-      // }
       try {
-        await this.$auth.loginWith('local', { data: { ID: this.id, Password: this.password } });
+        if (this.$refs.login_form.validate()) {
+          await this.$auth.loginWith('local', { data: { ID: this.id, Password: this.password } });
+        }
       } catch (error) {
-        console.log('errorだよ')
-        console.log(error)
+        if (error.response) {
+          this.error = error.response.data.Msg
+        } else {
+          this.error = "予期せぬなエラーが発生しました. 問い合わせてください."
+        }
       }
     }
   }

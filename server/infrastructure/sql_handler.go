@@ -10,8 +10,16 @@ type SqlHandler struct {
 	db *sql.DB
 }
 
-func NewSqlHandler() *SqlHandler {
-	db, err := sql.Open("mysql", "root:densan@tcp(mysql)/umr")
+type SqlConfig struct {
+	User string  `toml:"user"`
+	Password string  `toml:"password"`
+	Host string  `toml:"host"`
+	Port string  `toml:"port"`
+	Database string  `toml:"database"`
+}
+
+func NewSqlHandler(config SqlConfig) *SqlHandler {
+	db, err := sql.Open("mysql", config.User+":"+config.Password+"@tcp("+config.Host+":"+config.Port+")/"+config.Database)
 	if err != nil {
 		fmt.Print(err.Error())
 		return nil

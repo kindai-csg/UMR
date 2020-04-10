@@ -4,6 +4,7 @@ import (
 	"github.com/kindaidensan/UMR/usecase"
 	"github.com/kindaidensan/UMR/domain"
 	"github.com/kindaidensan/UMR/interfaces/database"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type AccountController struct {
@@ -31,7 +32,13 @@ func NewAccountController(ldapHandler database.LdapHandler, redisHandler databas
 func (controller *AccountController) TemporaryCreate(c Context) {
 	account := domain.Account{}
 	c.Bind(&account)
-	err := controller.interactor.DuplicateCheck(account.ID)
+	validate := validator.New()
+	err := validate.Struct(account)
+	if err != nil {
+		c.JSON(500, NewMsg(err.Error()))
+		return
+	}
+	err = controller.interactor.DuplicateCheck(account.ID)
 	if err != nil {
 		c.JSON(500, NewMsg(err.Error()))
 		return

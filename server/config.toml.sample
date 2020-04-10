@@ -1,0 +1,24 @@
+[LdapConfig]
+host = "ldap"
+port = "389"
+password = "densan"
+
+[RedisConfig]
+host = "redis"
+port = "6379"
+
+[SqlConfig]
+user = "root"
+password = "densan"
+host = "mysql"
+port = "3306"
+database = "umr"
+
+[MailConfig]
+from = "admin@kindai-csg.dev"
+host = "smtp"
+user = "admin"
+password = "password"
+
+[JWTConfig]
+secret = "test"

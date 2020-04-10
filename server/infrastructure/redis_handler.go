@@ -10,7 +10,12 @@ type RedisHandler struct {
 	pool *redis.Pool
 }
 
-func NewRedisHandler() *RedisHandler {
+type RedisConfig struct {
+	Host string  `toml:"Host"`
+	Port string  `toml:"Port"`
+}
+
+func NewRedisHandler(config RedisConfig) *RedisHandler {
 	// connection, err := redis.Dial("tcp", "redis:6379")
 	// if err != nil {
 	// 	return nil
@@ -20,7 +25,7 @@ func NewRedisHandler() *RedisHandler {
 			MaxIdle: 3,
 			MaxActive: 0,
 			IdleTimeout: 240 * time.Second,
-			Dial: func() (redis.Conn, error) { return redis.Dial("tcp", "redis:6379") },
+			Dial: func() (redis.Conn, error) { return redis.Dial("tcp", config.Host+":"+config.Port) },
 		},
 	}
 	return &redisHandler

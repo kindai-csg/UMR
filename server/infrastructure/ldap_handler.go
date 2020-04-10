@@ -8,23 +8,29 @@ type LdapHandler struct {
 	connection *ldap.Conn 
 }
 
-func NewLdapHandler() *LdapHandler{
-	ldap, err := ldap.Dial("tcp", "ldap:389")
+type LdapConfig struct {
+	Host string  `toml:"host"`
+	Port string  `toml:"port"`
+	Password string  `toml:"password"`
+}
+
+func NewLdapHandler(config LdapConfig) *LdapHandler{
+	ldap, err := ldap.Dial("tcp", config.Host+":"+config.Port)
 	if err != nil {
-		return nil 
+		return nil
 	}
 	ldapHandler := LdapHandler {
 		connection: ldap, 
 	}
-	err = ldapHandler.Bind()
+	err = ldapHandler.Bind(config.Password)
 	if err != nil {
 		return nil
 	}
 	return &ldapHandler
 }
 
-func (handler *LdapHandler) Bind() error {
-	err := handler.connection.Bind("cn=Manager,dc=kindai-csg,dc=dev", "densan")
+func (handler *LdapHandler) Bind(password string) error {
+	err := handler.connection.Bind("cn=Manager,dc=kindai-csg,dc=dev", password)
 	if  err != nil {
 		return err
 	}

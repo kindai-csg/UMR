@@ -15,6 +15,11 @@ export default {
       resultInfo: "",
     }
   },
+  head() {
+    return {
+      title: 'メール認証',
+    }
+  },
   mounted() {
     const params = new URLSearchParams()
     params.append('ID', this.$route.query.id)
@@ -24,9 +29,9 @@ export default {
         this.result = "認証完了"
         this.resultInfo = "認証が完了しました. 会費を払い管理者にアカウントをアクティベートしてもらうことで登録が完了となります."
       })
-      .catch((err) => {
+      .catch((error) => {
         this.result = "認証失敗"
-        console.log(err.response.data.Msg)
+        this.resultInfo = error.response.data.Msg
       })
   },
 }
