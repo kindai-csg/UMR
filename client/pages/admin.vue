@@ -44,6 +44,9 @@
       <v-card>
         <v-card-title>アカウント管理</v-card-title>
         <v-card-text>
+          <v-alert type="error" v-if="account_error">
+            {{ account_error }}
+          </v-alert>
           <v-data-table
             :headers="accounts_headers"
             :items="accounts_desserts"
@@ -67,6 +70,9 @@
       <v-card>
         <v-card-title>アカウントアクティベイト</v-card-title>
         <v-card-text>
+          <v-alert type="error" v-if="activate_error">
+            {{ activate_error }}
+          </v-alert>
           <v-data-table
             :headers="activate_headers"
             :items="activate_desserts"
@@ -98,7 +104,9 @@ export default {
       form_url: "",
       form_time: 0,
       form_error: "",
-      required: value => !!value || "必須科目です",
+      account_error: "",
+      activate_error: "",
+      required: value => !!value || "必須項目です",
       number_check: value => !isNaN(value) || "半角英数字のみで入力してください",
 
       accounts_headers: [
@@ -160,20 +168,18 @@ export default {
 
     this.$axios.$post('/api/admin/get_all_accounts')
       .then((result) => {
-        console.log(result)
         this.accounts_desserts = result
       })
       .catch((error) => {
-        console.log(error.response.data.Msg)
+        this.account_error =  error.response.data.Msg
       })
 
     this.$axios.$post('/api/admin/get_all_non_active_account_id')
       .then((result) => {
-        console.log(result)
         this.activate_desserts = result
       })
       .catch((error) => {
-        console.log(error.response.data.Msg)
+        this.activate_error = error.response.data.Msg
       })
   },
   methods: {
@@ -203,25 +209,25 @@ export default {
       params.append('ID', item.ID)
       this.$axios.$post('/api/admin/activation', params)
         .then(() => {
-          console.log("success")
+          this.activate_error = ''
           const index = this.activate_desserts.indexOf(item)
           this.activate_desserts.splice(index, 1)
         })
         .catch((error) => {
-          console.log(error.response.data.Msg)
+          this.activate_error =  error.response.data.Msg
         })
     },
     delete_account(account) {
       const params = new URLSearchParams()
-      console.log(account)
       params.append('ID', account.ID)
       this.$axios.$post('/api/admin/delete_account', params)
         .then(() => {
+          this.account_error = ''
           const index = this.accounts_desserts.indexOf(account)
           this.accounts_desserts.splice(index, 1)
         })
         .catch((error) => {
-          console.log(error.response.data.Msg)
+          this.account_error =  error.response.data.Msg
         })
 
     }
