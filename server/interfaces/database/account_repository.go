@@ -5,7 +5,8 @@ import (
 	"strings"
 	// "database/sql"
 	"crypto/md5"
-	"encoding/hex"
+	// "encoding/hex"
+	"encoding/base64"
 )
 
 type AccountRepository struct {
@@ -51,6 +52,7 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 		ou = "ou=account"
 	}
 	md5 := md5.Sum([]byte(account.Password))
+	password := base64.StdEncoding.EncodeToString(md5[:])
 	request := []string {
 		"dn", "cn="+account.ID+","+ou+",dc=kindai-csg,dc=dev",
 		"objectClass", "posixAccount",
@@ -60,7 +62,7 @@ func (repo *AccountRepository) Store(account domain.Account) error {
 		"uidNumber", account.UserIdNumber,
 		"gidNumber", account.GroupIdNumber,
 		"homeDirectory", account.HomeDirectory,
-		"userPassword", "{MD5}"+hex.EncodeToString(md5[:]),
+		"userPassword", "{MD5}"+password,
 		"sn", account.Name,
 		"displayName", account.Name,
 		"mail", account.EmailAddress,
