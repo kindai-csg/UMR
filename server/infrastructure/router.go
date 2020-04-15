@@ -4,13 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kindaidensan/UMR/domain"
 	"github.com/kindaidensan/UMR/interfaces/controllers"
-	// jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/BurntSushi/toml"
 	"strings"
 	"time"
 	"os"
-	"log"
 )
 
 type Config struct {
@@ -52,17 +50,25 @@ func init() {
 	authenticationController := controllers.NewAuthenticationController(redisHandler)
 
 	authMiddleware := func(c *gin.Context) {
-		log.Println("call middleware")
 		tokenString := c.GetHeader("Authorization")
 		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 		
-		_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		t, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			return []byte(config.JWTConfig.Secret), nil
-		});
-
+		})
+		
 		if err != nil {
 			c.AbortWithStatusJSON(500, gin.H{
 				"Msg": "認証に失敗しました",
+			})
+			return
+		}
+
+		claims := t.Claims.(jwt.MapClaims)
+		now := time.Now().Add(time.Hour * 0).Unix()
+		if (claims["exp"].(float64) < float64(now)) {
+			c.AbortWithStatusJSON(500, gin.H{
+				"Msg": "有効期限切れです",
 			})
 			return
 		}
