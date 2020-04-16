@@ -7,7 +7,7 @@ services:
     working_dir: "/.go/src/github.com/kindaidensan/UMR/"
     command: go run main.go
     ports:
-      - "127.0.0.1:8040:8040"
+      - "8040:8040"
     volumes:
       - "./server:/.go/src/github.com/kindaidensan/UMR/"
     extra_hosts:
@@ -25,7 +25,7 @@ services:
     working_dir: "/src"
     command: yarn start
     ports:
-      - "127.0.0.1:8050:3000"
+      - "8050:3000"
     volumes:
       - "./client:/src"
     tty: true
@@ -37,7 +37,7 @@ services:
     restart: always
     command: bash -c '/usr/local/libexec/slapd -h "ldap:/// ldapi:///" && bash'
     ports:
-      - "127.0.0.1:389:389"
+      - "389:389"
     volumes:
       - ./ldap:/usr/local/var/openldap-data
     tty: true
