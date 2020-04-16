@@ -14,7 +14,6 @@ services:
       - "localhost:172.24.178.1"
     depends_on:
       - ldap
-      - redis
       - mysql
     tty: true
     networks:
