@@ -20,6 +20,4 @@ ADD ./init.ldif /usr/local/etc/openldap/schema/init.ldif
 
 WORKDIR /root
 
-RUN rm -rf ./openldap-2.4.49 ./openldap-2.4.49.tgz 
-
 CMD ["bash"]

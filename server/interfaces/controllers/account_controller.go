@@ -48,7 +48,7 @@ func (controller *AccountController) TemporaryCreate(c Context) {
 		c.JSON(500, NewMsg(err.Error())) 
 		return
 	}
-	authUrl := "https://localhost:3080/authentication?id="+account.ID+"&code="+code
+	authUrl := "https://umr.kindai-csg.dev/authentication?id="+account.ID+"&code="+code
 	subject := "[近畿大学電子計算機研究会]メール認証"
 	body := "リンク先にアクセスして認証を完了させてください\r\n"+authUrl
 	err = controller.mail.SendMail(account.EmailAddress, subject, body)

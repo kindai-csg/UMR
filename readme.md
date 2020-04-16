@@ -8,22 +8,15 @@ UMRは2018年度会長の呼称です.
 ![](doc/image/arichitecture.png)
 
 # セットアップ
-1. client/nuxt.config.js編集
+1. server/config.toml編集
 ```
-axios: {
-    baseURL: 'http://nginx',
-    browserBaseURL: 'http://localhost:3080',
-  },
+cp server/config.toml.sample server/config.toml
 ```
-2. server/config.toml編集
+2. openldap/slapd.conf編集
 ```
-mv server/config.toml.sample server/config.toml
+cp openldap/slapd.conf.sample openldap/slapd.conf
 ```
-3. openldap/slapd.conf編集
-```
-rootpw	    {SSHA}ALphI+fuuimIRKB60GpjYkcTeMZrUjAW
-```
-4. install.sh
+3. install.sh
 ```
 ./install.sh
 ```

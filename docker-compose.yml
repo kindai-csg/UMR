@@ -10,11 +10,15 @@ services:
       - "127.0.0.1:8040:8040"
     volumes:
       - "./server:/.go/src/github.com/kindaidensan/UMR/"
+    extra_hosts:
+      - "localhost:172.24.178.1"
     depends_on:
       - ldap
       - redis
       - mysql
     tty: true
+    networks:
+      - umr
   client:
     build: ./nodejs
     container_name: umr-client
@@ -26,22 +30,26 @@ services:
     volumes:
       - "./client:/src"
     tty: true
+    networks:
+      - umr
   ldap:
     build: ./openldap
     container_name: umr-openldap
     restart: always
     command: bash -c '/usr/local/libexec/slapd -h "ldap:/// ldapi:///" && bash'
     ports:
-      - "127.0.0.1:389:389"
+      - "389:389"
     volumes:
       - ./ldap:/usr/local/var/openldap-data
     tty: true
-  redis:
-    image: redis:6.0-rc1-alpine3.11
-    container_name: umr-redis 
-    restart: always
-    volumes:
-      - "./redis:/data"
+    networks:
+      - umr
+  # redis:
+  #   image: redis:6.0-rc1-alpine3.11
+  #   container_name: umr-redis 
+  #   restart: always
+  #   volumes:
+  #     - "./redis:/data"
   mysql:
     image: mysql:5.7
     container_name: umr-mysql
@@ -51,3 +59,8 @@ services:
     volumes:
       - "./mysql:/var/lib/mysql"
       - "./mysql_init:/docker-entrypoint-initdb.d"
+    networks:
+      - umr 
+networks:
+  umr:
+    external: true

@@ -4,3 +4,4 @@ mysql/
 redis/
 slapd.d/
 server/config.toml
+openldap/slapd.conf

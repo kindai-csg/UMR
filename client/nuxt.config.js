@@ -48,8 +48,8 @@ export default {
     '@nuxtjs/auth',
   ],
   axios: {
-    baseURL: 'http://nginx',
-    browserBaseURL: 'http://localhost:3080',
+    baseURL: 'https://umr.kindai-csg.dev',
+    browserBaseURL: 'https://umr.kindai-csg.dev',
   },
   auth: {
     redirect: {

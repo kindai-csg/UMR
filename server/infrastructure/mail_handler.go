@@ -21,7 +21,7 @@ func NewMailHandler(config MailConfig) *MailHandler {
 	mailHandler := MailHandler {
 		from: config.From,
 		host: config.Host,
-		auth: smtp.PlainAuth("", config.User, config.Password, "smtp"),
+		auth: smtp.PlainAuth("", config.User, config.Password, config.Host),
 	}
 	return &mailHandler
 }
@@ -33,7 +33,7 @@ func (handler *MailHandler) SendMail(to string, subject string, body string) err
 		"Subject: " + subject + "\r\n" +
 		"\r\n" + body)
 
-	err := smtp.SendMail(handler.host + ":1025", nil, handler.from, []string{ to }, msg)
+	err := smtp.SendMail(handler.host + ":587", handler.auth, handler.from, []string{ to }, msg)
 	if  handler.auth == nil {
 		return nil
 	}
