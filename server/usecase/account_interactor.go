@@ -69,7 +69,11 @@ func (interactor *AccountInteractor) AuthenticationTemporaryAccount(clientAuth d
 }
 
 func (interactor *AccountInteractor ) Registration(account domain.Account)  error {
-	account.UserIdNumber = account.StudentNumber[7:]+account.StudentNumber[1:2]+account.StudentNumber[5:6]
+	uidHead := "5"
+	if (account.StudentNumber[7:8] != "0") {
+		uidHead = account.StudentNumber[7:8]
+	}
+	account.UserIdNumber = uidHead + account.StudentNumber[8:]+account.StudentNumber[1:2]+account.StudentNumber[5:6]
 	account.GroupIdNumber = "1002"
 	account.HomeDirectory = "/home/"+account.ID
 	err := interactor.AccountRepository.Store(account)
