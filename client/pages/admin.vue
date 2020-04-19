@@ -70,6 +70,7 @@
       <v-card>
         <v-card-title>アカウントアクティベイト</v-card-title>
         <v-card-text>
+          <v-checkbox v-model="autoActivate" label="自動アクティベイト"/>
           <v-alert type="error" v-if="activate_error">
             {{ activate_error }}
           </v-alert>
@@ -108,6 +109,7 @@ export default {
       activate_error: "",
       required: value => !!value || "必須項目です",
       number_check: value => !isNaN(value) || "半角英数字のみで入力してください",
+      autoActivate: false,
 
       accounts_headers: [
         {
@@ -154,7 +156,7 @@ export default {
       title: 'アカウント管理画面',
     }
   },
-  created() {
+  mounted() {
     this.$axios.$post('/api/admin/get_register_form')
       .then((result) => {
         this.form_url = location.origin + "/register?token=" + result.Token
@@ -191,8 +193,19 @@ export default {
       this.$axios.$post('/api/admin/get_all_non_active_account_id')
         .then((result) => {
           this.activate_desserts = result
+          if (!this.autoActivate) {
+            return
+          }
+          this.activate_desserts.forEach(account => {
+            const params = new URLSearchParams()
+            params.append('ID', account.ID)
+            this.$axios.$post('/api/admin/activation', params)
+              .then((result) => {
+              })
+          })
         })
     }, 5000)
+
   },
   methods: {
     logout() {
