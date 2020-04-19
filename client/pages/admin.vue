@@ -173,6 +173,12 @@ export default {
       .catch((error) => {
         this.account_error =  error.response.data.Msg
       })
+    setInterval(() => {
+      this.$axios.$post('/api/admin/get_all_accounts')
+        .then((result) => {
+          this.accounts_desserts = result
+        })
+    }, 5000)
 
     this.$axios.$post('/api/admin/get_all_non_active_account_id')
       .then((result) => {
@@ -181,6 +187,12 @@ export default {
       .catch((error) => {
         this.activate_error = error.response.data.Msg
       })
+    setInterval(() => {
+      this.$axios.$post('/api/admin/get_all_non_active_account_id')
+        .then((result) => {
+          this.activate_desserts = result
+        })
+    }, 5000)
   },
   methods: {
     logout() {
