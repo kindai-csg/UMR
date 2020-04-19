@@ -38,7 +38,7 @@ services:
     restart: always
     command: bash -c '/usr/local/libexec/slapd -h "ldap:/// ldapi:///" && bash'
     ports:
-      - "389:389"
+      - "127.0.0.1:389:389"
     volumes:
       - ./ldap:/usr/local/var/openldap-data
     tty: true
@@ -63,4 +63,8 @@ services:
       - umr 
 networks:
   umr:
+<<<<<<< HEAD
     external: true
+=======
+    external: true
+>>>>>>> 617c8add2cad32b970eb96690fe18ad3aeb4fcd3
