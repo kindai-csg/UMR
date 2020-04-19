@@ -20,22 +20,22 @@
       <v-card>
         <v-card-title>登録フォーム管理</v-card-title>
         <v-card-text>
-          <v-alert type="error" v-if="form_error">
-            {{ form_error }}
+          <v-alert type="error" v-if="formError">
+            {{ formError }}
           </v-alert>
-          <div v-if="form_url&&form_time">
-            フォームURL: {{ form_url }}
+          <div v-if="formUrl&&formTime">
+            フォームURL: {{ formUrl }}
             <br>
-            残り時間: {{ form_time }} 秒 
+            残り時間: {{ formTime }} 秒 
           </div>
           <br>
-          <v-form ref="create_form">
+          <v-form ref="createForm">
             <v-text-field
-            v-model="new_form_time"
+            v-model="newFormTime"
             label="有効期限(秒)"
-            :rules="[required, number_check]"
+            :rules="[required, numberCheck]"
             />
-            <v-btn text v-on:click="create_form">作成</v-btn>
+            <v-btn text v-on:click="createForm">作成</v-btn>
           </v-form>
         </v-card-text>
       </v-card>
@@ -44,12 +44,12 @@
       <v-card>
         <v-card-title>アカウント管理</v-card-title>
         <v-card-text>
-          <v-alert type="error" v-if="account_error">
-            {{ account_error }}
+          <v-alert type="error" v-if="accountError">
+            {{ accountError }}
           </v-alert>
           <v-data-table
-            :headers="accounts_headers"
-            :items="accounts_desserts"
+            :headers="accountsHeaders"
+            :items="accountsDesserts"
             :items-per-page="5"
             class="elevation-1"
           >
@@ -57,7 +57,7 @@
               <v-icon
                 small
                 class="mr-2"
-                @click="delete_account(item)"
+                @click="deleteAccount(item)"
               >
                 mdi-delete
               </v-icon>
@@ -70,12 +70,13 @@
       <v-card>
         <v-card-title>アカウントアクティベイト</v-card-title>
         <v-card-text>
-          <v-alert type="error" v-if="activate_error">
-            {{ activate_error }}
+          <v-checkbox v-model="autoActivate" label="自動アクティベイト"/>
+          <v-alert type="error" v-if="activateError">
+            {{ activateError }}
           </v-alert>
           <v-data-table
-            :headers="activate_headers"
-            :items="activate_desserts"
+            :headers="activateHeaders"
+            :items="activateDesserts"
             :items-per-page="5"
             class="elevation-1"
           >
@@ -83,7 +84,7 @@
               <v-icon
                 small
                 class="mr-2"
-                @click="activate_item(item)"
+                @click="activateItem(item)"
               >
                 mdi-account-check
               </v-icon>
@@ -100,16 +101,17 @@ export default {
   middleware: 'auth',
   data() {
     return {
-      new_form_time: 600,
-      form_url: "",
-      form_time: 0,
-      form_error: "",
-      account_error: "",
-      activate_error: "",
+      newFormTime: 600,
+      formUrl: "",
+      formTime: 0,
+      formError: "",
+      accountError: "",
+      activateError: "",
       required: value => !!value || "必須項目です",
-      number_check: value => !isNaN(value) || "半角英数字のみで入力してください",
+      numberCheck: value => !isNaN(value) || "半角英数字のみで入力してください",
+      autoActivate: false,
 
-      accounts_headers: [
+      accountsHeaders: [
         {
           text: "ユーザーID",
           align: "start",
@@ -133,8 +135,8 @@ export default {
           sortable: false,
         }
       ],
-      accounts_desserts: [],
-      activate_headers: [
+      accountsDesserts: [],
+      activateHeaders: [
         {
           text: "ユーザーID",
           align: "start",
@@ -146,7 +148,7 @@ export default {
           sortable: false,
         }
       ],
-      activate_desserts: [],
+      activateDesserts: [],
     }
   },
   head() {
@@ -154,82 +156,126 @@ export default {
       title: 'アカウント管理画面',
     }
   },
-  created() {
+  mounted() {
+    // 登録フォームの取得
     this.$axios.$post('/api/admin/get_register_form')
       .then((result) => {
-        this.form_url = location.origin + "/register?token=" + result.Token
-        this.form_time = result.Time
+        this.formUrl = location.origin + "/register?token=" + result.Token
+        this.formTime = result.Time
       })
+
+    // 登録フォームの生存秒数の表示の更新 (1秒ごと)
     setInterval(() => {
-      if (this.form_time > 0) {
-        this.form_time -= 1
+      if (this.formTime > 0) {
+        this.formTime -= 1
       }
     }, 1000)
 
+    // 全アカウントの取得
     this.$axios.$post('/api/admin/get_all_accounts')
       .then((result) => {
-        this.accounts_desserts = result
+        this.accountsDesserts = result
       })
       .catch((error) => {
-        this.account_error =  error.response.data.Msg
+        this.accountError =  error.response.data.Msg
       })
 
+    // 全アカウントの再取得 (5秒ごと)
+    setInterval(() => {
+      this.$axios.$post('/api/admin/get_all_accounts')
+        .then((result) => {
+          this.accountsDesserts = result
+        })
+    }, 5000)
+
+    // アクティベイト前のアカウントの取得
     this.$axios.$post('/api/admin/get_all_non_active_account_id')
       .then((result) => {
-        this.activate_desserts = result
+        this.activateDesserts = result
       })
       .catch((error) => {
-        this.activate_error = error.response.data.Msg
+        this.activateError = error.response.data.Msg
       })
+    
+    // アクティベイト前のアカウントの再取得 (5秒ごと)
+    // もし自動アクティベイトがオンならついでにアクティベイトに投げる
+    setInterval(() => {
+      this.$axios.$post('/api/admin/get_all_non_active_account_id')
+        .then((result) => {
+          this.activateDesserts = result
+          if (!this.autoActivate) {
+            return
+          }
+          this.activateDesserts.forEach(account => {
+            const params = new URLSearchParams()
+            params.append('ID', account.ID)
+            this.$axios.$post('/api/admin/activation', params)
+              .then((result) => {
+              })
+          })
+        })
+    }, 5000)
+
   },
   methods: {
+    /**
+     * 管理画面からログアウトする(token削除)
+     */
     logout() {
       this.$auth.logout()
     },
-    create_form() {
-      if (this.$refs.create_form.validate()) {
+    /**
+     * 登録フォームを生成する
+     */
+    createForm() {
+      if (this.$refs.createForm.validate()) {
         const params = new URLSearchParams()
-        params.append('Time', this.new_form_time)
+        params.append('Time', this.newFormTime)
         this.$axios.$post('/api/admin/create_register_form', params)
           .then((result) => {
-            this.form_url = location.origin + "/register?token=" + result.Token
-            this.form_time = result.Time
+            this.formUrl = location.origin + "/register?token=" + result.Token
+            this.formTime = result.Time
           })
           .catch((e) => {
             if (e.response) {
-              this.form_error = e.response.data.Msg
+              this.formError = e.response.data.Msg
             } else {
-              this.form_error = "予期せぬなエラーが発生しました." 
+              this.formError = "予期せぬなエラーが発生しました." 
             }
           })
       }
     },
-    activate_item(item) {
+    /**
+     * 指定アカウントをアクティベイトする
+     */
+    activateItem(item) {
       const params = new URLSearchParams()
       params.append('ID', item.ID)
       this.$axios.$post('/api/admin/activation', params)
         .then(() => {
-          this.activate_error = ''
-          const index = this.activate_desserts.indexOf(item)
-          this.activate_desserts.splice(index, 1)
+          this.activateError = ''
+          const index = this.activateDesserts.indexOf(item)
+          this.activateDesserts.splice(index, 1)
         })
         .catch((error) => {
-          this.activate_error =  error.response.data.Msg
+          this.activateError =  error.response.data.Msg
         })
     },
-    delete_account(account) {
+    /**
+     * 指定アカウントを削除する
+     */
+    deleteAccount(account) {
       const params = new URLSearchParams()
       params.append('ID', account.ID)
       this.$axios.$post('/api/admin/delete_account', params)
         .then(() => {
-          this.account_error = ''
-          const index = this.accounts_desserts.indexOf(account)
-          this.accounts_desserts.splice(index, 1)
+          this.accountError = ''
+          const index = this.accountsDesserts.indexOf(account)
+          this.accountsDesserts.splice(index, 1)
         })
         .catch((error) => {
-          this.account_error =  error.response.data.Msg
+          this.accountError =  error.response.data.Msg
         })
-
     }
   }
 }
