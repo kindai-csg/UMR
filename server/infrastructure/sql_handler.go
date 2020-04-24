@@ -3,7 +3,7 @@ package infrastructure
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"fmt"
+	"log"
 )
 
 type SqlHandler struct {
@@ -21,7 +21,7 @@ type SqlConfig struct {
 func NewSqlHandler(config SqlConfig) *SqlHandler {
 	db, err := sql.Open("mysql", config.User+":"+config.Password+"@tcp("+config.Host+":"+config.Port+")/"+config.Database)
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Print("faild connect mysql : %s", err.Error())
 		return nil
 	}
 	sqlHandler := SqlHandler {

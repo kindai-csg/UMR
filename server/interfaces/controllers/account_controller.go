@@ -5,6 +5,7 @@ import (
 	"github.com/kindaidensan/UMR/domain"
 	"github.com/kindaidensan/UMR/interfaces/database"
 	"gopkg.in/go-playground/validator.v9"
+	"log"
 )
 
 type AccountController struct {
@@ -52,6 +53,7 @@ func (controller *AccountController) TemporaryCreate(c Context) {
 	subject := "[近畿大学電子計算機研究会]メール認証"
 	body := "リンク先にアクセスして認証を完了させてください\r\n"+authUrl
 	err = controller.mail.SendMail(account.EmailAddress, subject, body)
+	log.Printf("%s success tmporary register : code %s", account.ID, code)
 	c.JSON(200, NewMsg("仮登録が完了しました."))
 } 
 
@@ -75,6 +77,7 @@ func (controller *AccountController) AuthenticationCreate(c Context) {
 	// 	return
 	// }
 	// c.JSON(200, NewMsg("本登録が完了しました."))
+	log.Printf("%s success authentication", auth.ID)
 	c.JSON(200, NewMsg("認証が完了しました."))
 }
 
@@ -92,9 +95,11 @@ func (controller *AccountController) Activation(c Context) {
 	}
 	err = controller.interactor.Registration(account)
 	if err != nil {
+		log.Printf("%s faild activation : %s", id, err.Error())
 		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
+	log.Printf("%s success register", id)
 	c.JSON(200, NewMsg("本登録が完了しました."))	
 }
 
@@ -123,6 +128,7 @@ func (controller *AccountController) DeleteAccount(c Context) {
 		c.JSON(500, NewMsg(err.Error()))
 		return
 	}
+	log.Printf("%s success delete", id)
 	c.JSON(200, NewMsg("success"))
 }
 
