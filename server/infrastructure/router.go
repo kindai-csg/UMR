@@ -23,6 +23,7 @@ type JWTConfig struct {
 var Router *gin.Engine
 
 func init() {
+	// config取得
 	var config Config
 	_, err := toml.DecodeFile("config.toml", &config)
 	if err != nil {
@@ -31,6 +32,7 @@ func init() {
 
 	router := gin.Default()
 
+	// 各handler生成
 	redisHandler := NewRedisHandler(config.RedisConfig)
 	mailHandler := NewMailHandler(config.MailConfig)
 	sqlHandler := NewSqlHandler(config.SqlConfig)
@@ -43,10 +45,16 @@ func init() {
 		os.Exit(2);
 	}
 
+	// 各コントローラ生成
 	accountController := controllers.NewAccountController(ldapHandler, redisHandler, mailHandler, sqlHandler)
 	settingController := controllers.NewSettingController(redisHandler)
 	authenticationController := controllers.NewAuthenticationController(redisHandler)
 
+	/*
+	-------------------
+	|	管理者権限API	|
+	-------------------
+	*/
 	admin := router.Group("/admin", tokenHandler.AuthMiddleware)
 	admin.POST("/create_register_form", func(c *gin.Context) {settingController.CreateRegisterForm(c)})
 	admin.POST("/get_register_form", func(c *gin.Context) {settingController.GetRegisterForm(c)})
@@ -55,6 +63,11 @@ func init() {
 	admin.POST("/get_all_non_active_account_id", func(c *gin.Context) {accountController.GetAllNonActiveAccountID(c)})
 	admin.POST("/delete_account", func(c *gin.Context) {accountController.DeleteAccount(c)})
 
+	/*
+	----------------
+	|	登録系API	|
+	----------------
+	*/
 	router.POST("/register", func(c *gin.Context) {
 		err := authenticationController.AuthenticationFormToken(c)
 		if err != nil {
@@ -62,10 +75,13 @@ func init() {
 		}
 		accountController.TemporaryCreate(c)
 	})
-
 	router.POST("/authentication", func(c *gin.Context) {accountController.AuthenticationCreate(c)})
 
-
+	/*
+	----------------
+	|	認証系API	|
+	----------------
+	*/
 	router.POST("/login", func(c *gin.Context) {
 		account := domain.LoginAccount{}
 		c.Bind(&account)
