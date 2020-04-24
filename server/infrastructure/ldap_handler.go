@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"gopkg.in/ldap.v2"
+	"log"
 )
 
 type LdapHandler struct {
@@ -24,6 +25,7 @@ func NewLdapHandler(config LdapConfig) *LdapHandler{
 	}
 	err = ldapHandler.Bind(config.Password)
 	if err != nil {
+		log.Printf("faild connection openldap : %s", err.Error())
 		return nil
 	}
 	return &ldapHandler
