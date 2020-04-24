@@ -4,10 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kindaidensan/UMR/domain"
 	"github.com/kindaidensan/UMR/interfaces/controllers"
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/BurntSushi/toml"
-	"strings"
-	"time"
 	"os"
 )
 
@@ -38,6 +35,7 @@ func init() {
 	mailHandler := NewMailHandler(config.MailConfig)
 	sqlHandler := NewSqlHandler(config.SqlConfig)
 	ldapHandler := NewLdapHandler(config.LdapConfig)
+	tokenHandler := NewTokenHandler(config.JWTConfig.Secret)
 	if ldapHandler == nil {
 		os.Exit(1)
 	}
@@ -49,33 +47,7 @@ func init() {
 	settingController := controllers.NewSettingController(redisHandler)
 	authenticationController := controllers.NewAuthenticationController(redisHandler)
 
-	authMiddleware := func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
-		
-		t, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte(config.JWTConfig.Secret), nil
-		})
-		
-		if err != nil {
-			c.AbortWithStatusJSON(500, gin.H{
-				"Msg": "認証に失敗しました",
-			})
-			return
-		}
-
-		claims := t.Claims.(jwt.MapClaims)
-		now := time.Now().Add(time.Hour * 0).Unix()
-		if (claims["exp"].(float64) < float64(now)) {
-			c.AbortWithStatusJSON(400, gin.H{
-				"Msg": "有効期限切れです",
-			})
-			return
-		}
-		
-	}
-
-	admin := router.Group("/admin", authMiddleware)
+	admin := router.Group("/admin", tokenHandler.AuthMiddleware)
 	admin.POST("/create_register_form", func(c *gin.Context) {settingController.CreateRegisterForm(c)})
 	admin.POST("/get_register_form", func(c *gin.Context) {settingController.GetRegisterForm(c)})
 	admin.POST("/get_all_accounts", func(c *gin.Context) {accountController.GetAllAccounts(c)})
@@ -102,13 +74,9 @@ func init() {
 			c.JSON(500, controllers.NewMsg(err.Error()))
 			return
 		}
-		token := jwt.New(jwt.SigningMethodHS256)
-		claims := token.Claims.(jwt.MapClaims)
-		claims["ID"] = account.ID
-		claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-		tokenString, _ := token.SignedString([]byte(config.JWTConfig.Secret))
+		token := tokenHandler.CreateToken(account.ID)
 		c.JSON(200, gin.H{
-			"token": tokenString,
+			"token": token,
 		})
 	})
 
