@@ -5,4 +5,5 @@ type LdapHandler interface {
 	UpdateRequest(string, []string) (error) 
 	DeleteRequest(string) (error) 
 	SearchRequest(string, []string) ([][]string, error) 
+	BindUser(string, string) (error)
 }

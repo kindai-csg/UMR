@@ -67,14 +67,14 @@ func init() {
 
 
 	router.POST("/login", func(c *gin.Context) {
-		account := domain.AdminAccount{}
+		account := domain.LoginAccount{}
 		c.Bind(&account)
-		err := accountController.Login(account.ID, account.Password)
+		err := accountController.Login(account.ID, account.Password, account.IsAdmin)
 		if err != nil {
 			c.JSON(500, controllers.NewMsg(err.Error()))
 			return
 		}
-		token := tokenHandler.CreateToken(account.ID)
+		token := tokenHandler.CreateToken(account.ID, account.IsAdmin)
 		c.JSON(200, gin.H{
 			"token": token,
 		})

@@ -6,6 +6,7 @@ import (
 	"github.com/kindaidensan/UMR/interfaces/database"
 	"gopkg.in/go-playground/validator.v9"
 	"log"
+	"errors"
 )
 
 type AccountController struct {
@@ -132,13 +133,24 @@ func (controller *AccountController) DeleteAccount(c Context) {
 	c.JSON(200, NewMsg("success"))
 }
 
-func (controller *AccountController) Login(id string, password string) error {
-	err := controller.interactor.AuthenticationAdminAccount(domain.AdminAccount{
-		ID: id,
-		Password: password,
-	})
-	if err != nil {
-		return err
+func (controller *AccountController) Login(id string, password string, isAdmin bool) error {
+	if (isAdmin) {
+		err := controller.interactor.AuthenticationAdminAccount(domain.LoginAccount{
+			ID: id,
+			Password: password,
+		})
+		if err != nil {
+			return err
+		}
+	} else {
+		err := controller.interactor.UserAuthentication(domain.LoginAccount{
+			ID: id,
+			Password: password,
+		})
+		if err != nil {
+			log.Printf("%s faild login : %s", id, err.Error())
+			return errors.New("IDかPasswordが間違っています")
+		}
 	}
 	return nil
 }

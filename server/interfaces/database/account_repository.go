@@ -141,23 +141,31 @@ func (repo *AccountRepository) DeleteAccount(id string) error {
 	return nil
 }
 
-func (repo *AccountRepository) GetAdminAccounts() ([]domain.AdminAccount, error) {
+func (repo *AccountRepository) GetAdminAccounts() ([]domain.LoginAccount, error) {
 	rows, err := repo.SqlHandler.Query("select * from admin")
 	if err != nil {
 		return nil, err
 	}
 
-	accounts := []domain.AdminAccount {}
+	accounts := []domain.LoginAccount {}
 	for rows.Next() {
 		var id string 
 		var password string
 		if err := rows.Scan(&id, &password); err != nil {
 			return nil, err
 		}
-		accounts = append(accounts, domain.AdminAccount {
+		accounts = append(accounts, domain.LoginAccount {
 			ID: id,
 			Password: password,
 		})
 	}
 	return accounts, nil 
+}
+
+func (repo *AccountRepository) UserAuthentication(id string, password string) error {
+	err := repo.LdapHandler.BindUser("cn="+id+",ou=account,dc=kindai-csg,dc=dev", password)
+	if err != nil {
+		return err
+	}
+	return nil
 }

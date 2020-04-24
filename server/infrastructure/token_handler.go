@@ -18,10 +18,11 @@ func NewTokenHandler(secret string) *TokenHandler {
 	return &tokenHandler
 }
 
-func (handler *TokenHandler) CreateToken(id string) string {
+func (handler *TokenHandler) CreateToken(id string, isAdmin bool) string {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["ID"] = id
+	claims["admin"] = isAdmin
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 	tokenString, _ := token.SignedString([]byte(handler.secret))
 	return tokenString
