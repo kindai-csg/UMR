@@ -67,7 +67,7 @@ func init() {
 		claims := t.Claims.(jwt.MapClaims)
 		now := time.Now().Add(time.Hour * 0).Unix()
 		if (claims["exp"].(float64) < float64(now)) {
-			c.AbortWithStatusJSON(500, gin.H{
+			c.AbortWithStatusJSON(400, gin.H{
 				"Msg": "有効期限切れです",
 			})
 			return
