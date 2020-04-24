@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"net/smtp"
+	"log"
 )
 
 type MailHandler struct {
@@ -38,6 +39,7 @@ func (handler *MailHandler) SendMail(to string, subject string, body string) err
 		return nil
 	}
 	if err != nil {
+		log.Print("faild send mail : %s", err.Error())
 		return err
 	}
 	return nil
