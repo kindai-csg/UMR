@@ -156,6 +156,17 @@ export default {
       title: 'アカウント管理画面',
     }
   },
+  created() {
+    this.$axios.$post('/api/get_token_authority')
+      .then((result) => {
+        if (!result.Admin) {
+          this.$router.push('/user')
+        }
+      })
+      .catch((error) => {
+        this.$router.push('/')
+      })
+  },
   mounted() {
     // 登録フォームの取得
     this.$axios.$post('/api/admin/get_register_form')
