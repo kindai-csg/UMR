@@ -55,7 +55,7 @@ func init() {
 	|	管理者権限API	|
 	-------------------
 	*/
-	admin := router.Group("/admin", tokenHandler.AuthMiddleware)
+	admin := router.Group("/admin", tokenHandler.AdminAuth)
 	admin.POST("/create_register_form", func(c *gin.Context) {settingController.CreateRegisterForm(c)})
 	admin.POST("/get_register_form", func(c *gin.Context) {settingController.GetRegisterForm(c)})
 	admin.POST("/get_all_accounts", func(c *gin.Context) {accountController.GetAllAccounts(c)})
@@ -95,6 +95,7 @@ func init() {
 			"token": token,
 		})
 	})
+	router.POST("/get_token_authority", func(c *gin.Context) {tokenHandler.GetTokenAuthority(c)})
 
 	Router = router
 }
