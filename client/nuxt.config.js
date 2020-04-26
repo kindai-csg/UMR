@@ -53,7 +53,7 @@ export default {
       login: '/', 
       logout: '/',
       callback: false,
-      home: '/admin'
+      home: '/user'
     },
     strategies: {
       local: {
