@@ -49,6 +49,7 @@ func init() {
 	accountController := controllers.NewAccountController(ldapHandler, redisHandler, mailHandler, sqlHandler)
 	settingController := controllers.NewSettingController(redisHandler)
 	authenticationController := controllers.NewAuthenticationController(redisHandler)
+	appController := controllers.NewAppController(sqlHandler)
 
 	/*
 	-------------------
@@ -96,6 +97,15 @@ func init() {
 		})
 	})
 	router.POST("/get_token_authority", func(c *gin.Context) {tokenHandler.GetTokenAuthority(c)})
+
+	/*
+	------------------
+	|	ユーザー操作API	|
+	------------------
+	*/
+	user := router.Group("/user", tokenHandler.UserAuth)
+	user.POST("/create_app", func(c *gin.Context) {appController.CreateApplication(c)})
+
 
 	Router = router
 }

@@ -66,6 +66,8 @@ func (handler *TokenHandler) AuthMiddleware(c *gin.Context, isAdmin bool) {
 		})
 		return
 	}
+
+	c.Set("userid", claims["ID"])
 }
 
 func (handler *TokenHandler) GetTokenAuthority(c *gin.Context) {
