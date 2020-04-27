@@ -105,6 +105,7 @@ func init() {
 	*/
 	user := router.Group("/user", tokenHandler.UserAuth)
 	user.POST("/create_app", func(c *gin.Context) {appController.CreateApplication(c)})
+	user.POST("/get_app", func(c *gin.Context) {appController.GetApplication(c)})
 
 
 	Router = router

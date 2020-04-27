@@ -41,8 +41,8 @@ func (interactor *AppInteractor) UpdateApplication(userId string, app domain.App
 	return a, nil
 }
 
-func (interactor *AppInteractor) GetApplication(userId string) ([]domain.App, error) {
-	apps, err := interactor.AppRepository.Get(userId)
+func (interactor *AppInteractor) FindByUserId(userId string) ([]domain.App, error) {
+	apps, err := interactor.AppRepository.FindByUserId(userId)
 	if err != nil {
 		return nil, err
 	}

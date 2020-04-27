@@ -36,3 +36,17 @@ func (controller *AppController) CreateApplication(c Context) {
 	}
 	c.JSON(200, a)
 }
+
+func (controller *AppController) GetApplication(c Context) {
+	userid, exist := c.Get("userid")
+	if !exist {
+		c.JSON(500, NewMsg("ユーザーIDエラー"))
+		return
+	}
+	apps, err := controller.interactor.FindByUserId(userid.(string))
+	if err != nil {
+		c.JSON(500, NewMsg(err.Error()))
+		return
+	}
+	c.JSON(200, apps)
+}
