@@ -1,6 +1,7 @@
 package domain
 
-type AdminAccount struct {
+type LoginAccount struct {
 	ID string
 	Password string
+	IsAdmin bool
 }

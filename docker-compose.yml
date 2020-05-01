@@ -51,11 +51,12 @@ services:
   #   volumes:
   #     - "./redis:/data"
   mysql:
-    image: mysql:5.7
+    build: ./mysql_dockerfile/
     container_name: umr-mysql
     restart: always
     environment:
       - "MYSQL_ROOT_PASSWORD=densan"
+      - "TZ=Asia/Tokyo"
     volumes:
       - "./mysql:/var/lib/mysql"
       - "./mysql_init:/docker-entrypoint-initdb.d"

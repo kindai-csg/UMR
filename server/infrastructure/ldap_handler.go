@@ -6,7 +6,8 @@ import (
 )
 
 type LdapHandler struct {
-	connection *ldap.Conn 
+	connection *ldap.Conn
+	config LdapConfig
 }
 
 type LdapConfig struct {
@@ -21,7 +22,8 @@ func NewLdapHandler(config LdapConfig) *LdapHandler{
 		return nil
 	}
 	ldapHandler := LdapHandler {
-		connection: ldap, 
+		connection: ldap,
+		config: config,
 	}
 	err = ldapHandler.Bind(config.Password)
 	if err != nil {
@@ -106,4 +108,17 @@ func (handler *LdapHandler) SearchRequest(id string, attributes []string) ([][]s
 
 func (handler *LdapHandler) Close() {
 	handler.connection.Close()
+}
+
+func (handler *LdapHandler) BindUser(dn string, password string) error {
+	ldap, err := ldap.Dial("tcp", handler.config.Host+":"+handler.config.Port)
+	if err != nil {
+		return err
+	}
+	err = ldap.Bind(dn, password)
+	if err != nil {
+		return err
+	}
+	ldap.Close()
+	return nil
 }
