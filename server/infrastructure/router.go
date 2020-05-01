@@ -4,10 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kindaidensan/UMR/domain"
 	"github.com/kindaidensan/UMR/interfaces/controllers"
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/BurntSushi/toml"
-	"strings"
-	"time"
 	"os"
 )
 
@@ -17,6 +14,7 @@ type Config struct {
 	SqlConfig SqlConfig
 	MailConfig MailConfig
 	JWTConfig JWTConfig
+	VoteConfig controllers.VoteConfig
 }
 
 type JWTConfig struct {
@@ -26,6 +24,7 @@ type JWTConfig struct {
 var Router *gin.Engine
 
 func init() {
+	// config取得
 	var config Config
 	_, err := toml.DecodeFile("config.toml", &config)
 	if err != nil {
@@ -34,10 +33,12 @@ func init() {
 
 	router := gin.Default()
 
+	// 各handler生成
 	redisHandler := NewRedisHandler(config.RedisConfig)
 	mailHandler := NewMailHandler(config.MailConfig)
 	sqlHandler := NewSqlHandler(config.SqlConfig)
 	ldapHandler := NewLdapHandler(config.LdapConfig)
+	tokenHandler := NewTokenHandler(config.JWTConfig.Secret)
 	if ldapHandler == nil {
 		os.Exit(1)
 	}
@@ -45,37 +46,24 @@ func init() {
 		os.Exit(2);
 	}
 
+	// 各コントローラ生成
 	accountController := controllers.NewAccountController(ldapHandler, redisHandler, mailHandler, sqlHandler)
 	settingController := controllers.NewSettingController(redisHandler)
 	authenticationController := controllers.NewAuthenticationController(redisHandler)
+	appController := controllers.NewAppController(sqlHandler)
 
-	authMiddleware := func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
-		
-		t, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte(config.JWTConfig.Secret), nil
-		})
-		
-		if err != nil {
-			c.AbortWithStatusJSON(500, gin.H{
-				"Msg": "認証に失敗しました",
-			})
-			return
-		}
-
-		claims := t.Claims.(jwt.MapClaims)
-		now := time.Now().Add(time.Hour * 0).Unix()
-		if (claims["exp"].(float64) < float64(now)) {
-			c.AbortWithStatusJSON(500, gin.H{
-				"Msg": "有効期限切れです",
-			})
-			return
-		}
-		
+	// gRPCコントローラ生成
+	voteController, err := controllers.NewVoteController(config.VoteConfig)
+	if err != nil {
+		panic(err)
 	}
 
-	admin := router.Group("/admin", authMiddleware)
+	/*
+	-------------------
+	|	管理者権限API	|
+	-------------------
+	*/
+	admin := router.Group("/admin", tokenHandler.AdminAuth)
 	admin.POST("/create_register_form", func(c *gin.Context) {settingController.CreateRegisterForm(c)})
 	admin.POST("/get_register_form", func(c *gin.Context) {settingController.GetRegisterForm(c)})
 	admin.POST("/get_all_accounts", func(c *gin.Context) {accountController.GetAllAccounts(c)})
@@ -83,6 +71,11 @@ func init() {
 	admin.POST("/get_all_non_active_account_id", func(c *gin.Context) {accountController.GetAllNonActiveAccountID(c)})
 	admin.POST("/delete_account", func(c *gin.Context) {accountController.DeleteAccount(c)})
 
+	/*
+	----------------
+	|	登録系API	|
+	----------------
+	*/
 	router.POST("/register", func(c *gin.Context) {
 		err := authenticationController.AuthenticationFormToken(c)
 		if err != nil {
@@ -90,27 +83,46 @@ func init() {
 		}
 		accountController.TemporaryCreate(c)
 	})
-
 	router.POST("/authentication", func(c *gin.Context) {accountController.AuthenticationCreate(c)})
 
-
+	/*
+	----------------
+	|	認証系API	|
+	----------------
+	*/
 	router.POST("/login", func(c *gin.Context) {
-		account := domain.AdminAccount{}
+		account := domain.LoginAccount{}
 		c.Bind(&account)
-		err := accountController.Login(account.ID, account.Password)
+		err := accountController.Login(account.ID, account.Password, account.IsAdmin)
 		if err != nil {
 			c.JSON(500, controllers.NewMsg(err.Error()))
 			return
 		}
-		token := jwt.New(jwt.SigningMethodHS256)
-		claims := token.Claims.(jwt.MapClaims)
-		claims["ID"] = account.ID
-		claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-		tokenString, _ := token.SignedString([]byte(config.JWTConfig.Secret))
+		token := tokenHandler.CreateToken(account.ID, account.IsAdmin)
 		c.JSON(200, gin.H{
-			"token": tokenString,
+			"token": token,
 		})
 	})
+	router.POST("/get_token_authority", func(c *gin.Context) {tokenHandler.GetTokenAuthority(c)})
+
+	/*
+	------------------
+	|	ユーザー操作API	|
+	------------------
+	*/
+	user := router.Group("/user", tokenHandler.UserAuth)
+	user.POST("/create_app", func(c *gin.Context) {appController.CreateApplication(c)})
+	user.POST("/get_app", func(c *gin.Context) {appController.GetApplication(c)})
+
+	/*
+	-----------------
+	|	VOTE API	|
+	-----------------
+	*/
+	user.POST("/vote/create", func(c *gin.Context) {voteController.Create(c)})
+	user.POST("/vote/get", func(c *gin.Context) {voteController.Get(c)})
+	user.POST("/vote/vote", func(c *gin.Context) {voteController.Vote(c)})
+
 
 	Router = router
 }

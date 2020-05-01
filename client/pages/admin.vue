@@ -1,98 +1,88 @@
 <template>
-  <v-layout
-    column
-    justify-center
-    align-center
-  >
-    <v-flex
-      xs12
-      sm8
-      md6
-    >
-      <v-card>
-        <v-card-title>アカウント管理画面</v-card-title>
-        <v-card-text>
-          <button @click="logout">Logout</button>
-        </v-card-text>
-      </v-card>
-      <br>
-      <br>
-      <v-card>
-        <v-card-title>登録フォーム管理</v-card-title>
-        <v-card-text>
-          <v-alert type="error" v-if="formError">
-            {{ formError }}
-          </v-alert>
-          <div v-if="formUrl&&formTime">
-            フォームURL: {{ formUrl }}
-            <br>
-            残り時間: {{ formTime }} 秒 
-          </div>
+  <v-layout column>
+    <v-card>
+      <v-card-title>アカウント管理画面</v-card-title>
+      <v-card-text>
+        <button @click="logout">Logout</button>
+      </v-card-text>
+    </v-card>
+    <br>
+    <br>
+    <v-card>
+      <v-card-title>登録フォーム管理</v-card-title>
+      <v-card-text>
+        <v-alert type="error" v-if="formError">
+          {{ formError }}
+        </v-alert>
+        <div v-if="formUrl&&formTime">
+          フォームURL: {{ formUrl }}
           <br>
-          <v-form ref="createForm">
-            <v-text-field
-            v-model="newFormTime"
-            label="有効期限(秒)"
-            :rules="[required, numberCheck]"
-            />
-            <v-btn text v-on:click="createForm">作成</v-btn>
-          </v-form>
-        </v-card-text>
-      </v-card>
-      <br>
-      <br>
-      <v-card>
-        <v-card-title>アカウント管理</v-card-title>
-        <v-card-text>
-          <v-alert type="error" v-if="accountError">
-            {{ accountError }}
-          </v-alert>
-          <v-data-table
-            :headers="accountsHeaders"
-            :items="accountsDesserts"
-            :items-per-page="5"
-            class="elevation-1"
-          >
-            <template v-slot:item.actions="{ item }">
-              <v-icon
-                small
-                class="mr-2"
-                @click="deleteAccount(item)"
-              >
-                mdi-delete
-              </v-icon>
-            </template>
-          </v-data-table>
-        </v-card-text>
-      </v-card>
-      <br>
-      <br>
-      <v-card>
-        <v-card-title>アカウントアクティベイト</v-card-title>
-        <v-card-text>
-          <v-checkbox v-model="autoActivate" label="自動アクティベイト"/>
-          <v-alert type="error" v-if="activateError">
-            {{ activateError }}
-          </v-alert>
-          <v-data-table
-            :headers="activateHeaders"
-            :items="activateDesserts"
-            :items-per-page="5"
-            class="elevation-1"
-          >
-            <template v-slot:item.actions="{ item }">
-              <v-icon
-                small
-                class="mr-2"
-                @click="activateItem(item)"
-              >
-                mdi-account-check
-              </v-icon>
-            </template>
-          </v-data-table>
-        </v-card-text>
-      </v-card>
-    </v-flex>
+          残り時間: {{ formTime }} 秒 
+        </div>
+        <br>
+        <v-form ref="createForm">
+          <v-text-field
+          v-model="newFormTime"
+          label="有効期限(秒)"
+          :rules="[required, numberCheck]"
+          />
+          <v-btn text v-on:click="createForm">作成</v-btn>
+        </v-form>
+      </v-card-text>
+    </v-card>
+    <br>
+    <br>
+    <v-card>
+      <v-card-title>アカウント管理</v-card-title>
+      <v-card-text>
+        <v-alert type="error" v-if="accountError">
+          {{ accountError }}
+        </v-alert>
+        <v-data-table
+          :headers="accountsHeaders"
+          :items="accountsDesserts"
+          :items-per-page="5"
+          class="elevation-1"
+        >
+          <template v-slot:item.actions="{ item }">
+            <v-icon
+              small
+              class="mr-2"
+              @click="deleteAccount(item)"
+            >
+              mdi-delete
+            </v-icon>
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
+    <br>
+    <br>
+    <v-card>
+      <v-card-title>アカウントアクティベイト</v-card-title>
+      <v-card-text>
+        <v-checkbox v-model="autoActivate" label="自動アクティベイト"/>
+        <v-alert type="error" v-if="activateError">
+          {{ activateError }}
+        </v-alert>
+        <v-data-table
+          :headers="activateHeaders"
+          :items="activateDesserts"
+          :items-per-page="5"
+          class="elevation-1"
+        >
+          <template v-slot:item.actions="{ item }">
+            <v-icon
+              small
+              class="mr-2"
+              @click="activateItem(item)"
+            >
+              mdi-account-check
+            </v-icon>
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
   </v-layout>
 </template>
 
@@ -155,6 +145,17 @@ export default {
     return {
       title: 'アカウント管理画面',
     }
+  },
+  created() {
+    this.$axios.$post('/api/get_token_authority')
+      .then((result) => {
+        if (!result.Admin) {
+          this.$router.push('/user')
+        }
+      })
+      .catch((error) => {
+        this.$router.push('/')
+      })
   },
   mounted() {
     // 登録フォームの取得

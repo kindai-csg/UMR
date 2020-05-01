@@ -44,7 +44,7 @@ export default {
     async login() {
       try {
         if (this.$refs.login_form.validate()) {
-          await this.$auth.loginWith('local', { data: { ID: this.id, Password: this.password } });
+          await this.$auth.loginWith('local', { data: { ID: this.id, Password: this.password, IsAdmin: this.$route.query.type === 'admin' } });
         }
       } catch (error) {
         if (error.response) {
