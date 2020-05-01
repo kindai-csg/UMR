@@ -9,6 +9,55 @@
       <br>
       <br>
       <v-card>
+        <v-card-title>投票</v-card-title>
+        <v-card-text>
+          <v-alert type="error" v-if="voteError">
+            {{ voteError }}
+          </v-alert>
+          <v-alert type="success" v-if="voteSuccess">
+            {{ voteSuccess }}
+          </v-alert>
+          <v-form ref="voteForm">
+            <v-text-field
+              v-model="votedID"
+              label="ID"
+              :rules="[required]"
+            />
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn text v-on:click="voteAgree">賛成</v-btn>
+          <v-btn text v-on:click="voteDisagree">反対</v-btn>
+        </v-card-actions>
+      </v-card>
+      <br>
+      <br>
+      <v-card>
+        <v-card-title>作成</v-card-title>
+        <v-card-text>
+          <v-alert type="error" v-if="error">
+            {{ error }}
+          </v-alert>
+          <v-form ref="createVoteForm">
+            <v-text-field
+              v-model="voteTitle"
+              label="title"
+              :rules="[required]"
+            />
+            <v-text-field
+              v-model="voteDescription"
+              label="description"
+              :rules="[required]"
+            />
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn text v-on:click="createVote">送信する</v-btn>
+        </v-card-actions>
+      </v-card>
+      <br>
+      <br>
+      <!-- <v-card>
         <v-card-title>アプリケーション作成</v-card-title>
         <v-card-text>
           <v-alert type="error" v-if="error">
@@ -40,10 +89,22 @@
         <v-card-actions>
           <v-btn text v-on:click="create">送信する</v-btn>
         </v-card-actions>
-      </v-card>
+      </v-card> -->
       <br>
       <br>
       <v-card>
+        <v-card-title>一覧</v-card-title>
+        <v-card-text>
+          <v-data-table
+            :headers="votesHeaders"
+            :items="votesDesserts"
+            :items-per-page="5"
+            class="elevation-1"
+          >
+          </v-data-table>
+        </v-card-text>
+      </v-card>
+      <!-- <v-card>
         <v-card-title>アプリケーション一覧</v-card-title>
         <v-card-text>
           <v-data-table
@@ -63,7 +124,7 @@
             </template>
           </v-data-table>
         </v-card-text>
-      </v-card>
+      </v-card> -->
   </v-layout>
 </template>
 
@@ -114,6 +175,48 @@ export default {
         },
       ],
       appsDesserts: [],
+
+      voteTitle: "",
+      voteDescription: "",
+      votedID: "",
+      votesHeaders: [
+        {
+          text: "ID",
+          align: "start",
+          value: "id",
+        },
+        {
+          text: "タイトル",
+          value: "title"
+        },
+        {
+          text: "詳細",
+          value: "description",
+        },
+        {
+          text: "作成者",
+          value: "owner",
+        },
+        {
+          text: "作成日",
+          value: "created",
+        },
+        {
+          text: "終了日",
+          value: "closed"
+        },
+        {
+          text: "賛成",
+          value: "agree",
+        },
+        {
+          text: "反対",
+          value: "disagree",
+        }
+      ],
+      votesDesserts: [],
+      voteError: "",
+      voteSuccess: "",
     }
   },
   middleware: 'auth',
@@ -128,9 +231,18 @@ export default {
         this.$router.push('/')
       })
 
-    this.$axios.$post('/api/user/get_app')
+    // this.$axios.$post('/api/user/get_app')
+    //   .then((result) => {
+    //     this.appsDesserts = result
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.response.data.Msg)
+    //   })
+
+    this.$axios.$post('/api/user/vote/get')
       .then((result) => {
-        this.appsDesserts = result
+        console.log(result)
+        this.votesDesserts = result.agendas
       })
       .catch((error) => {
         console.log(error.response.data.Msg)
@@ -169,6 +281,56 @@ export default {
           })
       }
     },
-  }
+    createVote() {
+      if (this.$refs.createVoteForm.validate()) {
+        const params = new URLSearchParams()
+        params.append('Title', this.voteTitle)
+        params.append('Description', this.voteDescription)
+        this.$axios.$post('/api/user/vote/create', params)
+          .then((result) => {
+            console.log(result)
+            this.error = ""
+            this.voteTitle = ""
+            this.voteDescription = ""
+            this.$refs.createVoteForm.resetValidation()
+          })
+          .catch((e) => {
+            if (e.response) {
+              this.error = e.response.data.Msg
+            } else {
+              this.error = "予期せぬなエラーが発生しました. 問い合わせてください."
+            }
+          })
+      }  
+    },
+    voteAgree() {
+      if (this.$refs.voteForm.validate()) {
+        this.vote(true)
+      }
+    },
+    voteDisagree() {
+      if (this.$refs.voteForm.validate()) {
+        this.vote(false)
+      }
+    },
+    vote(agree) {
+      const params = new URLSearchParams()
+        params.append('Id', parseInt(this.votedID))
+        params.append('Agree', agree)
+        this.$axios.$post('/api/user/vote/vote', params)
+          .then((result) => {
+            console.log(result)
+            this.voteError = ""
+            this.voteSuccess = result.status ? "success" : "faild"
+          })
+          .catch((e) => {
+            if (e.response) {
+              this.voteError = e.response.data.Msg
+            } else {
+              this.voteError = "予期せぬなエラーが発生しました. 問い合わせてください."
+            }
+          })
+    }  
+  },
 }
 </script>

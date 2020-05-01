@@ -14,6 +14,7 @@ type Config struct {
 	SqlConfig SqlConfig
 	MailConfig MailConfig
 	JWTConfig JWTConfig
+	VoteConfig controllers.VoteConfig
 }
 
 type JWTConfig struct {
@@ -50,6 +51,12 @@ func init() {
 	settingController := controllers.NewSettingController(redisHandler)
 	authenticationController := controllers.NewAuthenticationController(redisHandler)
 	appController := controllers.NewAppController(sqlHandler)
+
+	// gRPCコントローラ生成
+	voteController, err := controllers.NewVoteController(config.VoteConfig)
+	if err != nil {
+		panic(err)
+	}
 
 	/*
 	-------------------
@@ -106,6 +113,15 @@ func init() {
 	user := router.Group("/user", tokenHandler.UserAuth)
 	user.POST("/create_app", func(c *gin.Context) {appController.CreateApplication(c)})
 	user.POST("/get_app", func(c *gin.Context) {appController.GetApplication(c)})
+
+	/*
+	-----------------
+	|	VOTE API	|
+	-----------------
+	*/
+	user.POST("/vote/create", func(c *gin.Context) {voteController.Create(c)})
+	user.POST("/vote/get", func(c *gin.Context) {voteController.Get(c)})
+	user.POST("/vote/vote", func(c *gin.Context) {voteController.Vote(c)})
 
 
 	Router = router
