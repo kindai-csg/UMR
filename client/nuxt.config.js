@@ -53,7 +53,7 @@ export default {
       login: '/', 
       logout: '/',
       callback: false,
-      home: '/admin'
+      home: '/user'
     },
     strategies: {
       local: {
@@ -72,7 +72,7 @@ export default {
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     theme: {
-      dark: true,
+      dark: false,
       themes: {
         dark: {
           primary: colors.blue.darken2,

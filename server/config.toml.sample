@@ -22,3 +22,7 @@ password = "password"
 
 [JWTConfig]
 secret = "test"
+
+[VoteConfig]
+Host = "your.host"
+Port = "8041"
