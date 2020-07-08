@@ -16,7 +16,8 @@
   "dependencies": {
     "@nuxtjs/auth": "^4.9.0",
     "@nuxtjs/axios": "^5.9.5",
-    "nuxt": "^2.0.0"
+    "nuxt": "^2.0.0",
+    "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
     "@ava/babel": "^1.0.0",
