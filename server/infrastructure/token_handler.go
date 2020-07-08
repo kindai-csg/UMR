@@ -5,7 +5,6 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"strings"
 	"time"
-	"fmt"
 )
 
 type TokenHandler struct {
