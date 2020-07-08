@@ -104,6 +104,7 @@ func init() {
 		})
 	})
 	router.POST("/get_token_authority", func(c *gin.Context) {tokenHandler.GetTokenAuthority(c)})
+	router.GET("/is_login", func(c *gin.Context) {tokenHandler.IsLogin(c)})
 
 	/*
 	------------------

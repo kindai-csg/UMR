@@ -5,6 +5,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"strings"
 	"time"
+	"fmt"
 )
 
 type TokenHandler struct {
@@ -97,4 +98,38 @@ func (handler *TokenHandler) GetTokenAuthority(c *gin.Context) {
 	c.JSON(200, gin.H {
 		"Admin": claims["admin"],
 	})
+}
+
+func (handler *TokenHandler) IsLogin(c *gin.Context) {
+	cookie, err := c.Cookie("auth._token.local")
+	if err != nil {
+		c.JSON(401, gin.H{
+			"Msg": "認証に失敗しました",
+		})
+		return
+	} 
+
+	tokenString := strings.TrimPrefix(cookie, "Bearer ")
+	
+	t, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(handler.secret), nil
+	})
+
+	if err != nil {
+		c.JSON(401, gin.H{
+			"Msg": "認証に失敗しました",
+		})
+		return
+	}
+
+	claims := t.Claims.(jwt.MapClaims)
+	now := time.Now().Add(time.Hour * 0).Unix()
+	if (claims["exp"].(float64) < float64(now)) {
+		c.JSON(401, gin.H{
+			"Msg": "有効期限切れです",
+		})
+		return
+	}
+
+	c.AbortWithStatus(200)
 }
