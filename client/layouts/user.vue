@@ -41,9 +41,6 @@
         <nuxt />
       </v-container>
     </v-content>
-    <v-footer padless app>
-      &copy; {{ new Date().getFullYear() }} Kindai Univ Computer Study Group.
-    </v-footer>
   </v-app>
 </template>
 
