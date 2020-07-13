@@ -1,5 +1,6 @@
 <template>
   <v-layout column>
+    <a href="/user/rec/videos/">log</a>
     <v-card v-for="n in number" :key=number>
       <v-card-title>Camera {{ n }}</v-card-title>
       <v-card-text>
